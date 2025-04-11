@@ -1,36 +1,45 @@
 package com.example.cricket_app.controller;
 
-import com.example.cricket_app.dto.request.CreditWalletRequest;
 import com.example.cricket_app.dto.request.WalletTransactionRequest;
-import com.example.cricket_app.dto.response.WalletResponse;
-import com.example.cricket_app.dto.response.WalletTransactionResponse;
+import com.example.cricket_app.enums.TransactionType;
+import com.example.cricket_app.service.WalletService;
 import com.example.cricket_app.service.WalletTransactionService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/wallets")
+@RequestMapping("/wallet")
 public class WalletTransactionController {
 
-   private  WalletTransactionService walletTransactionService;
+    private final WalletTransactionService walletTransactionService;
 
-   @Autowired
+    @Autowired
     public WalletTransactionController(WalletTransactionService walletTransactionService) {
         this.walletTransactionService = walletTransactionService;
     }
 
     @PostMapping("/transaction")
-    public ResponseEntity<WalletTransactionResponse> creditWallet(@Valid @RequestBody WalletTransactionRequest request) {
-        WalletTransactionResponse response = walletTransactionService.createTransaction(request);
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/user/{userId}")
-    public List<WalletTransactionResponse> getTransactionsByUserId(@PathVariable Long userId) {
-        return walletTransactionService.getTransactionsByUserId(userId);
+    public ResponseEntity<String> addWalletTransaction(@RequestBody WalletTransactionRequest request) {
+        if (request.getTransactionType() == TransactionType.BET_PLACED) {
+            walletTransactionService.debitFromWallet(
+                    request.getUserId(),
+                    request.getAmount(),
+                    request.getDescription(),
+                    request.getMatchId()
+            );
+        } else {
+            walletTransactionService.creditToWallet(
+                    request.getUserId(),
+                    request.getAmount(),
+                    request.getDescription(),
+                    request.getTransactionType(),
+                    request.getMatchId()
+            );
+        }
+        return ResponseEntity.ok("Transaction successful");
     }
 }

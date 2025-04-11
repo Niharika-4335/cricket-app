@@ -10,7 +10,7 @@ public class WalletTransactionRequest {
 
     private Long userId;
     private BigDecimal amount;
+    private String description;
     private TransactionType transactionType;
     private Long matchId;
-    private String description;
 }

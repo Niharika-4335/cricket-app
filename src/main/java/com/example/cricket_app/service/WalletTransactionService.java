@@ -1,13 +1,12 @@
 package com.example.cricket_app.service;
 
-import com.example.cricket_app.dto.request.WalletTransactionRequest;
-import com.example.cricket_app.dto.response.WalletTransactionResponse;
+import com.example.cricket_app.enums.TransactionType;
 
-import java.util.List;
+import java.math.BigDecimal;
 
 public interface WalletTransactionService {
 
-    public WalletTransactionResponse createTransaction(WalletTransactionRequest requestDTO);
+    public void creditToWallet(Long userId, BigDecimal amount, String description, TransactionType type, Long matchId);
 
-    public List<WalletTransactionResponse> getTransactionsByUserId(Long userId);
+    public void debitFromWallet(Long userId, BigDecimal amount, String description, Long matchId);
 }
