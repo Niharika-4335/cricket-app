@@ -16,5 +16,4 @@ public class CreditWalletRequest {
     private BigDecimal amount;
 
     private String description;
-
 }

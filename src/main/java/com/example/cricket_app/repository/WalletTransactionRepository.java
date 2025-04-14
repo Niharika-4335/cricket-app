@@ -10,6 +10,9 @@ import java.util.Optional;
 
 @Repository
 public interface WalletTransactionRepository extends JpaRepository<WalletTransaction, Long> {
+    List<WalletTransaction> findByWallet_User_IdOrderByCreatedAtDesc(Long userId);
+
+
 
 
 }

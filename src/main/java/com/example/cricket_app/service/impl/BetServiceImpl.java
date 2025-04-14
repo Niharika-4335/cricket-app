@@ -1,10 +1,12 @@
 package com.example.cricket_app.service.impl;
 
 import com.example.cricket_app.dto.request.BetRequest;
+import com.example.cricket_app.dto.response.BetResponse;
 import com.example.cricket_app.entity.Bet;
 import com.example.cricket_app.entity.Match;
 import com.example.cricket_app.entity.Users;
 import com.example.cricket_app.enums.BetStatus;
+import com.example.cricket_app.mapper.BetMapper;
 import com.example.cricket_app.repository.BetRepository;
 import com.example.cricket_app.repository.MatchRepository;
 import com.example.cricket_app.repository.UserRepository;
@@ -14,6 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BetServiceImpl implements BetService {
@@ -21,13 +26,15 @@ public class BetServiceImpl implements BetService {
     private MatchRepository matchRepository;
     private BetRepository betRepository;
     private WalletTransactionService walletTransactionService;
+    private BetMapper betMapper;
 
     @Autowired
-    public BetServiceImpl(UserRepository userRepository, BetRepository betRepository, MatchRepository matchRepository, WalletTransactionService walletTransactionService) {
+    public BetServiceImpl(UserRepository userRepository, MatchRepository matchRepository, BetRepository betRepository, WalletTransactionService walletTransactionService, BetMapper betMapper) {
         this.userRepository = userRepository;
-        this.betRepository = betRepository;
         this.matchRepository = matchRepository;
+        this.betRepository = betRepository;
         this.walletTransactionService = walletTransactionService;
+        this.betMapper = betMapper;
     }
 
     @Override
@@ -53,6 +60,15 @@ public class BetServiceImpl implements BetService {
         bet.setTeamChosen(request.getTeamChosen());
         bet.setAmount(betAmount);
         bet.setStatus(BetStatus.PENDING);
+        bet.setCreatedAt(LocalDateTime.now());
         betRepository.save(bet);
+    }
+
+    @Override
+    public List<BetResponse> getUserBetHistory(Long userId) {
+        List<Bet> bets = betRepository.findByUser_IdOrderByIdDesc(userId);
+        return bets.stream()
+                .map(betMapper::toResponse) // use MapStruct or manual mapping
+                .collect(Collectors.toList());
     }
 }

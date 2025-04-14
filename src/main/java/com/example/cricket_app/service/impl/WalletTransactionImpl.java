@@ -1,10 +1,14 @@
 package com.example.cricket_app.service.impl;
 
+import com.example.cricket_app.dto.response.WalletTransactionResponse;
 import com.example.cricket_app.entity.Match;
+import com.example.cricket_app.entity.Users;
 import com.example.cricket_app.entity.Wallet;
 import com.example.cricket_app.entity.WalletTransaction;
 import com.example.cricket_app.enums.TransactionType;
+import com.example.cricket_app.mapper.WalletTransactionMapper;
 import com.example.cricket_app.repository.MatchRepository;
+import com.example.cricket_app.repository.UserRepository;
 import com.example.cricket_app.repository.WalletRepository;
 import com.example.cricket_app.repository.WalletTransactionRepository;
 import com.example.cricket_app.service.WalletTransactionService;
@@ -12,19 +16,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class WalletTransactionImpl implements WalletTransactionService {
 
     private WalletRepository walletRepository;
     private MatchRepository matchRepository;
     private WalletTransactionRepository walletTransactionRepository;
+    private WalletTransactionMapper walletTransactionMapper;
+    private UserRepository userRepository;
 
-    @Autowired
-    public WalletTransactionImpl(WalletRepository walletRepository, MatchRepository matchRepository, WalletTransactionRepository walletTransactionRepository) {
+    public WalletTransactionImpl(WalletRepository walletRepository, MatchRepository matchRepository, WalletTransactionRepository walletTransactionRepository, WalletTransactionMapper walletTransactionMapper, UserRepository userRepository) {
         this.walletRepository = walletRepository;
         this.matchRepository = matchRepository;
         this.walletTransactionRepository = walletTransactionRepository;
+        this.walletTransactionMapper = walletTransactionMapper;
+        this.userRepository = userRepository;
     }
+
 
     @Override
     public void creditToWallet(Long userId, BigDecimal amount, String description, TransactionType type, Long matchId) {
@@ -76,5 +87,14 @@ public class WalletTransactionImpl implements WalletTransactionService {
         transaction.setMatch(match); // Set match if available
         walletTransactionRepository.save(transaction);
     }
+
+    @Override
+    public List<WalletTransactionResponse> getTransactionsByUserId(Long userId) {
+        List<WalletTransaction> transactions = walletTransactionRepository
+                .findByWallet_User_IdOrderByCreatedAtDesc(userId);
+
+        return walletTransactionMapper.toResponseDtoList(transactions);
+    }
+
 
 }

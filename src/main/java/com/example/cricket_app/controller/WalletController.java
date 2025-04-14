@@ -28,9 +28,11 @@ public class WalletController {
         return ResponseEntity.ok(response);
     }
 
-//    @GetMapping("/user/{userId}")
-//    public List<WalletTransactionResponse> getTransactionsByUserId(@PathVariable Long userId) {
-//        return walletService.getTransactionsByUserId(userId);
-//    }
+    @GetMapping("/balance/{userId}")
+    public ResponseEntity<WalletResponse> viewCurrentBalance(@PathVariable Long userId) {
+        WalletResponse response = walletService.viewCurrentBalance(userId);
+        return ResponseEntity.ok(response);
+    }
+
 
 }

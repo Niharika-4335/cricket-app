@@ -11,4 +11,6 @@ public interface WalletService {
 
     public WalletResponse creditWallet(CreditWalletRequest creditWalletRequest);
 
+    public WalletResponse viewCurrentBalance(Long userId);
+
 }

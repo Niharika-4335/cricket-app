@@ -10,10 +10,10 @@ import java.time.LocalDateTime;
 @Data
 public class WalletTransactionResponse {
     private Long id;
-    private Long userId;
     private BigDecimal amount;
-    private TransactionType transactionType;
-    private Long matchId;
-    private LocalDateTime  createdAt;
+    private String transactionType;
     private String description;
+    private LocalDateTime createdAt;
+    private Long matchId;
+    private Long userId;
 }

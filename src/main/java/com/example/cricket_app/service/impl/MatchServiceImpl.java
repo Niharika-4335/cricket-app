@@ -5,9 +5,12 @@ import com.example.cricket_app.dto.response.MatchResponse;
 import com.example.cricket_app.dto.response.UpcomingMatchResponse;
 import com.example.cricket_app.entity.Match;
 import com.example.cricket_app.enums.MatchStatus;
+import com.example.cricket_app.enums.Team;
 import com.example.cricket_app.mapper.MatchMapper;
 import com.example.cricket_app.repository.MatchRepository;
+import com.example.cricket_app.repository.PayOutRepository;
 import com.example.cricket_app.service.MatchService;
+import com.example.cricket_app.service.PayOutService;
 import jakarta.transaction.Transactional;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +26,13 @@ import java.util.stream.Collectors;
 public class MatchServiceImpl implements MatchService {
     private MatchRepository matchRepository;
     private MatchMapper matchMapper;
+    private PayOutService payOutService;
 
     @Autowired
-    public MatchServiceImpl(MatchRepository matchRepository, MatchMapper matchMapper) {
+    public MatchServiceImpl(MatchRepository matchRepository, MatchMapper matchMapper, PayOutService payOutService) {
         this.matchRepository = matchRepository;
         this.matchMapper = matchMapper;
+        this.payOutService = payOutService;
     }
 
     @Override
@@ -73,6 +78,25 @@ public class MatchServiceImpl implements MatchService {
         return matchMapper.toResponseDto(match);
     }
 
+    @Override
+    public void declareMatchWinner(Long matchId, String winningTeam) {
+        Match match = matchRepository.findById(matchId)
+                .orElseThrow(() -> new RuntimeException("Match not found"));
+
+        if (match.getWinningTeam() != null) {
+            throw new RuntimeException("Winner already declared for this match.");
+        }
+
+        if (match.getStartTime().isAfter(LocalDateTime.now())) {
+            throw new RuntimeException("Cannot declare winner before match starts.");
+        }
+        Team winningTeamEnum = Team.valueOf(winningTeam); // Converts String to Enum
+        match.setWinningTeam(winningTeamEnum);
+        match.setStatus(MatchStatus.COMPLETED);
+        matchRepository.save(match);
+        payOutService.processPayout(match);
+    }
+
 
     @Scheduled(fixedRate = 60000)
     public void updateMatchStatuses() {
@@ -86,8 +110,18 @@ public class MatchServiceImpl implements MatchService {
             match.setStatus(MatchStatus.ONGOING);
             match.setUpdatedAt(now);
             matchRepository.save(match);
+        }//to change the status if time passed from the present time now.
+
+        List<Match> toComplete = matchRepository.findAll().stream()
+                .filter(m -> m.getStatus() == MatchStatus.ONGOING && m.getStartTime().plusMinutes(5).isBefore(now))
+                .collect(Collectors.toList());
+
+        for (Match match : toComplete) {
+            match.setStatus(MatchStatus.COMPLETED);
+            match.setUpdatedAt(now);
+            matchRepository.save(match);
         }
-    }//here we are running this script to change the status if time passed from the present time now.
+    }
 
 
 }

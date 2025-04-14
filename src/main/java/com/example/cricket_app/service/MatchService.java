@@ -11,4 +11,6 @@ public interface MatchService {
     public UpcomingMatchResponse getUpcomingMatches();
 
     public MatchResponse getMatchById(Long id);
+
+    public void declareMatchWinner(Long matchId, String winningTeam);
 }

@@ -27,15 +27,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse saveUser(UserRequest userRequest) {
-//        System.out.println(userRequestDto.getEmail());
-//        System.out.println(userRequestDto.getPasswordHash());
-//        System.out.println(userRequestDto.getFullName());
         Users user = userMapper.toEntity(userRequest);
-        //we are taking dto and converting into entity using mapper.
-        //before updating to database we will change to entity product
-//        System.out.println(user.getEmail());
-//        System.out.println(user.getPasswordHash());
-//        System.out.println(user.getFullName());
         userRepository.save(user);
         return userMapper.toResponseDto(user);
     }
