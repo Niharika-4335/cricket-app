@@ -23,16 +23,16 @@ public class Match {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "team_a", nullable = false)
+    @Column(name = "team_a")
     private String teamA;
 
-    @Column(name = "team_b", nullable = false)
+    @Column(name = "team_b")
     private String teamB;
 
-    @Column(name = "start_time", nullable = false)
+    @Column(name = "start_time")
     private LocalDateTime startTime;
 
-    @Column(name = "bet_amount", nullable = false, precision = 10, scale = 2)
+    @Column(name = "bet_amount",precision = 10, scale = 2)
     private BigDecimal betAmount;
 
     @Enumerated(EnumType.STRING)
@@ -43,7 +43,7 @@ public class Match {
     @Column(name = "winning_team")
     private Team winningTeam;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
@@ -52,11 +52,11 @@ public class Match {
     @OneToMany(mappedBy = "match")
     private Set<Bet> bets = new HashSet<>();
 
-    @OneToMany(mappedBy = "match")
-    private Set<Payout> payouts = new HashSet<>();
+//    @OneToMany(mappedBy = "match")
+//    private Set<Payout> payouts = new HashSet<>();
 
-    @OneToOne(mappedBy = "match", cascade = CascadeType.ALL)
-    private MatchPayoutStatus payoutStatus;
+//    @OneToOne(mappedBy = "match", cascade = CascadeType.ALL)
+//    private MatchPayoutStatus payoutStatus;
 
     @OneToMany(mappedBy = "match")
     private Set<WalletTransaction> transactions = new HashSet<>();

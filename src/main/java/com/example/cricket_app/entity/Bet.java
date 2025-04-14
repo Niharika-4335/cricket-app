@@ -23,25 +23,25 @@ public class Bet {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private Users user;//one bet per user and one bet per one match
 
     @ManyToOne
-    @JoinColumn(name = "match_id", nullable = false)
+    @JoinColumn(name = "match_id")
     private Match match;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "team_chosen", nullable = false)
+    @Column(name = "team_chosen")
     private Team teamChosen;
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(precision = 10, scale = 2)
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private BetStatus status = BetStatus.PENDING;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @PrePersist

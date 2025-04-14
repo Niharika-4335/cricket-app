@@ -10,9 +10,11 @@ import java.util.List;
 
 @Repository
 public interface BetRepository extends JpaRepository<Bet, Long> {
-    boolean existsByUserAndMatch(Users user, Match match);
+    boolean existsByUserAndMatch(Users user, Match match);//if there exists  a match with particular user.
 
     List<Bet> findByUser_IdOrderByIdDesc(Long userId);
+    //here performing nested query so using underscore.
+    //Bet we have user as field we want bet id so we use underscore while writing nested queries.
 
     List<Bet> findByMatch(Match match);
 

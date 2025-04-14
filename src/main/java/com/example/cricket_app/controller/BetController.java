@@ -2,7 +2,6 @@ package com.example.cricket_app.controller;
 
 import com.example.cricket_app.dto.request.BetRequest;
 import com.example.cricket_app.dto.response.BetResponse;
-import com.example.cricket_app.dto.response.WalletTransactionResponse;
 import com.example.cricket_app.service.BetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

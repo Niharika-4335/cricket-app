@@ -2,6 +2,7 @@ package com.example.cricket_app.controller;
 
 import com.example.cricket_app.dto.request.CreateMatchRequest;
 import com.example.cricket_app.dto.response.MatchResponse;
+import com.example.cricket_app.dto.response.PastMatchesResultResponse;
 import com.example.cricket_app.dto.response.UpcomingMatchResponse;
 import com.example.cricket_app.service.MatchService;
 import jakarta.validation.Valid;
@@ -10,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -34,10 +37,11 @@ public class MatchController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{match_id}")
-    public ResponseEntity<MatchResponse> getUpcomingMatches(@PathVariable Long match_id) {
-        MatchResponse response = matchService.getMatchById(match_id);
-        return ResponseEntity.ok(response);
+    @GetMapping("/completed")
+    public ResponseEntity<List<PastMatchesResultResponse>> getCompletedMatches() {
+        List<PastMatchesResultResponse> pastMatchesResultResponses = matchService.viewPastMatchesResults();
+        return ResponseEntity.ok(pastMatchesResultResponses);
+
     }
 
 

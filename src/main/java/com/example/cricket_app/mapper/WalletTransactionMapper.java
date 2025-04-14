@@ -15,5 +15,6 @@ public interface WalletTransactionMapper {
     WalletTransactionResponse toResponseDto(WalletTransaction transaction);
 
     List<WalletTransactionResponse> toResponseDtoList(List<WalletTransaction> transactions);
+    //source->entity side target->dto side.
 
 }

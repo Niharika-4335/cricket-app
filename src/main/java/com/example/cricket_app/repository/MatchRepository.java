@@ -12,10 +12,8 @@ import java.util.List;
 public interface MatchRepository extends JpaRepository<Match, Long> {
 
     @Query("SELECT m FROM Match m WHERE m.status = 'UPCOMING' AND m.startTime > :now ORDER BY m.startTime ASC")
-    List<Match> findUpcomingMatches(LocalDateTime now);
+    List<Match> findUpcomingMatches(LocalDateTime now);//writing native jpql query.
 
-    @Query("SELECT m FROM Match m WHERE m.status = 'COMPLETED' ORDER BY m.startTime DESC")
-    List<Match> findCompletedMatches();
 
 
 }

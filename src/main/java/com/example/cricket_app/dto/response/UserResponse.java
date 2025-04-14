@@ -13,8 +13,7 @@ public class UserResponse {
     private String email;
     private String fullName;
     private UserRole role;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private Double balance;
 
 
 }

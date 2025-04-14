@@ -22,18 +22,18 @@ public class Payout {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "match_id", nullable = false)
+    @JoinColumn(name = "match_id")
     private Match match;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private Users user;//one payout per user and per match
     //we have to use unique constraint because if there are two match ids 2 times bet will be done.
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(precision = 10, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "processed_at", nullable = false, updatable = false)
+    @Column(name = "processed_at")
     private LocalDateTime processedAt;
 
     @PrePersist

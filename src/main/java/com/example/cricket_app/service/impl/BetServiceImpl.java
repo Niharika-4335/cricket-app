@@ -6,6 +6,10 @@ import com.example.cricket_app.entity.Bet;
 import com.example.cricket_app.entity.Match;
 import com.example.cricket_app.entity.Users;
 import com.example.cricket_app.enums.BetStatus;
+import com.example.cricket_app.enums.MatchStatus;
+import com.example.cricket_app.exception.DuplicateBetException;
+import com.example.cricket_app.exception.MatchNotFoundException;
+import com.example.cricket_app.exception.UserNotFoundException;
 import com.example.cricket_app.mapper.BetMapper;
 import com.example.cricket_app.repository.BetRepository;
 import com.example.cricket_app.repository.MatchRepository;
@@ -40,22 +44,26 @@ public class BetServiceImpl implements BetService {
     @Override
     public void placeBet(BetRequest request) {
         Users user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         Match match = matchRepository.findById(request.getMatchId())
-                .orElseThrow(() -> new RuntimeException("Match not found"));
+                .orElseThrow(() -> new MatchNotFoundException("Match not found"));
 
         if (betRepository.existsByUserAndMatch(user, match)) {
-            throw new RuntimeException("User already placed a bet for this match.");
+            throw new DuplicateBetException("User already placed a bet for this match.");
         }
 
-        BigDecimal betAmount = match.getBetAmount(); // get amount from match
+        if(match.getStatus()== MatchStatus.ONGOING || match.getStatus() == MatchStatus.COMPLETED){
+              throw new IllegalStateException("Bets are not allowed after the match has started.");
+        }
+
+        BigDecimal betAmount = match.getBetAmount();
 
         walletTransactionService.debitFromWallet(user.getId(), betAmount,
                 "Bet placed on match " + match.getId(), match.getId());
 
         Bet bet = new Bet();
-        bet.setUser(user);
+        bet.setUser(user);//passing the whole object because we cant only pass the user_id.
         bet.setMatch(match);
         bet.setTeamChosen(request.getTeamChosen());
         bet.setAmount(betAmount);
@@ -68,7 +76,7 @@ public class BetServiceImpl implements BetService {
     public List<BetResponse> getUserBetHistory(Long userId) {
         List<Bet> bets = betRepository.findByUser_IdOrderByIdDesc(userId);
         return bets.stream()
-                .map(betMapper::toResponse) // use MapStruct or manual mapping
+                .map(betMapper::toResponse)//betMapper is an object and toResponse refers to the instance method.
                 .collect(Collectors.toList());
     }
 }

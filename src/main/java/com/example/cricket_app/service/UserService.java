@@ -7,10 +7,10 @@ import com.example.cricket_app.entity.Users;
 import java.util.List;
 
 public interface UserService {
-    public UserResponse saveUser(UserRequest userRequest);
+    public void saveUser(UserRequest userRequest);
 
-    public List<Users> showUsers();
+    public List<UserResponse> showUsers();
 
-    public Users findUserById(Long id);
+    public UserResponse findUserById(Long id);
 
 }

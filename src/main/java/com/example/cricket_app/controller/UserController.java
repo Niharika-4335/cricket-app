@@ -19,17 +19,17 @@ public class UserController {
 
     @PostMapping()
     @Transactional
-    public UserResponse CreateUser(@Valid @RequestBody UserRequest userRequest) {
-        return userService.saveUser(userRequest);
+    public void CreateUser(@Valid @RequestBody UserRequest userRequest) {
+         userService.saveUser(userRequest);
     }
 
     @GetMapping()
-    public List<Users> getListOfUsers() {
+    public List<UserResponse> getListOfUsers() {
         return userService.showUsers();
     }
 
     @GetMapping("/{id}")
-    public Users getUserById(@PathVariable Long id) {
+    public UserResponse getUserById(@PathVariable Long id) {
         return userService.findUserById(id);
     }
 

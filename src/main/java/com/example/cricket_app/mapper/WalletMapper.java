@@ -10,10 +10,10 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface WalletMapper {
 
-    @Mapping(target = "id",ignore = true)
-    @Mapping(target = "user", source = "user") // manually passed in service
-    @Mapping(target = "balance", source = "creditWalletRequest.amount")
-    Wallet toEntity(CreditWalletRequest creditWalletRequest,Users user);
+//    @Mapping(target = "id",ignore = true)
+//    @Mapping(target = "user", source = "user") // manually passed in service
+//    @Mapping(target = "balance", source = "creditWalletRequest.amount")
+//    Wallet toEntity(CreditWalletRequest creditWalletRequest,Users user);
 
     WalletResponse toResponseDto(Wallet wallet);
 }

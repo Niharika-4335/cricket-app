@@ -4,7 +4,9 @@ import com.example.cricket_app.entity.Users;
 import com.example.cricket_app.enums.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
 @Data
 public class UserRequest {
@@ -13,6 +15,7 @@ public class UserRequest {
     private String email;
 
     @NotBlank(message = "Password is required")
+    @Size(min = 6, max = 20, message = "Password must be between 6 and 20 characters")
     private String passwordHash;
 
     @NotBlank(message = "Full name is required")

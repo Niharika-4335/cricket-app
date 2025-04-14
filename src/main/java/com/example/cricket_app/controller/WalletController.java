@@ -3,14 +3,11 @@ package com.example.cricket_app.controller;
 
 import com.example.cricket_app.dto.request.CreditWalletRequest;
 import com.example.cricket_app.dto.response.WalletResponse;
-import com.example.cricket_app.dto.response.WalletTransactionResponse;
 import com.example.cricket_app.service.WalletService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/wallets")
