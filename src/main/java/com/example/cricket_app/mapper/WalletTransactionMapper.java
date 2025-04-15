@@ -11,7 +11,7 @@ import java.util.List;
 public interface WalletTransactionMapper {
 
     @Mapping(source = "wallet.user.id", target = "userId")
-    @Mapping(source = "match.id", target = "matchId") // if match can be null, consider null checks later
+    @Mapping(source = "match.id", target = "matchId")
     WalletTransactionResponse toResponseDto(WalletTransaction transaction);
 
     List<WalletTransactionResponse> toResponseDtoList(List<WalletTransaction> transactions);

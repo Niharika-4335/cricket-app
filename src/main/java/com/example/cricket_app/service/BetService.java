@@ -10,4 +10,6 @@ public interface BetService {
     public void placeBet(BetRequest request);
 
     public List<BetResponse> getUserBetHistory(Long userId);
+
+    public void updateBetStatusesForMatchWinner(Long matchId);
 }

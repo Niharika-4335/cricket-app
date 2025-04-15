@@ -72,6 +72,29 @@ public class BetServiceImpl implements BetService {
         betRepository.save(bet);
     }
 
+
+    @Override
+    public void updateBetStatusesForMatchWinner(Long matchId) {
+        Match match = matchRepository.findById(matchId)
+                .orElseThrow(() -> new MatchNotFoundException("Match not found"));
+
+        if (match.getWinningTeam() == null) {
+            throw new IllegalStateException("Match winner is not declared yet.");
+        }
+
+        List<Bet> bets = betRepository.findByMatch_Id(matchId);
+
+        for (Bet bet : bets) {
+            if (bet.getTeamChosen().equals(match.getWinningTeam())) {
+                bet.setStatus(BetStatus.WON);
+            } else {
+                bet.setStatus(BetStatus.LOST);
+            }
+        }
+
+        betRepository.saveAll(bets);
+    }
+
     @Override
     public List<BetResponse> getUserBetHistory(Long userId) {
         List<Bet> bets = betRepository.findByUser_IdOrderByIdDesc(userId);

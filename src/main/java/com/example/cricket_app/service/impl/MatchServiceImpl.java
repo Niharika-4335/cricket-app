@@ -11,6 +11,7 @@ import com.example.cricket_app.exception.*;
 import com.example.cricket_app.mapper.MatchMapper;
 import com.example.cricket_app.mapper.PastMatchesResultMapper;
 import com.example.cricket_app.repository.MatchRepository;
+import com.example.cricket_app.service.BetService;
 import com.example.cricket_app.service.MatchService;
 import com.example.cricket_app.service.PayOutService;
 import jakarta.transaction.Transactional;
@@ -30,13 +31,15 @@ public class MatchServiceImpl implements MatchService {
     private MatchMapper matchMapper;
     private PayOutService payOutService;
     private PastMatchesResultMapper pastMatchesResultMapper;
+    private BetService betService;
 
     @Autowired
-    public MatchServiceImpl(MatchRepository matchRepository, MatchMapper matchMapper, PayOutService payOutService, PastMatchesResultMapper pastMatchesResultMapper) {
+    public MatchServiceImpl(MatchRepository matchRepository, MatchMapper matchMapper, PayOutService payOutService, PastMatchesResultMapper pastMatchesResultMapper, BetService betService) {
         this.matchRepository = matchRepository;
         this.matchMapper = matchMapper;
         this.payOutService = payOutService;
         this.pastMatchesResultMapper = pastMatchesResultMapper;
+        this.betService = betService;
     }
 
     @Override
@@ -97,8 +100,10 @@ public class MatchServiceImpl implements MatchService {
         Team winningTeamEnum = Team.valueOf(winningTeam); //valueOf converts String to Enum
         match.setWinningTeam(winningTeamEnum);
         match.setStatus(MatchStatus.COMPLETED);
-        matchRepository.save(match);//after saving winning team payout will be executed.
+        matchRepository.save(match);
+        betService.updateBetStatusesForMatchWinner(matchId);
         payOutService.processPayout(match);
+
     }
 
     @Override

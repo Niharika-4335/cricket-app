@@ -18,4 +18,6 @@ public interface BetRepository extends JpaRepository<Bet, Long> {
 
     List<Bet> findByMatch(Match match);
 
+    List<Bet> findByMatch_Id(Long matchId);
+
 }

@@ -17,6 +17,7 @@ import com.example.cricket_app.service.WalletTransactionService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -93,6 +94,7 @@ public class WalletTransactionImpl implements WalletTransactionService {
         List<WalletTransaction> transactions = walletTransactionRepository
                 .findByWallet_User_IdOrderByCreatedAtDesc(userId);
 
+        //(List<WalletTransaction>) transactions.stream().sorted()
         return walletTransactionMapper.toResponseDtoList(transactions);
     }
 
