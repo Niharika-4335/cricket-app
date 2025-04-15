@@ -8,10 +8,10 @@ import lombok.Data;
 @Data
 public class BetRequest {
 
-    @NotNull(message="User ID is required")
+    @NotNull(message = "User ID is required")
     private Long userId;
-    @NotNull(message="Match ID is required")
+    @NotNull(message = "Match ID is required")
     private Long matchId;
-    @NotBlank(message="team should not be null")
+    @NotBlank(message = "team should not be null")
     private Team teamChosen;
 }

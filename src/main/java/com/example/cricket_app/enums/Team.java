@@ -12,7 +12,7 @@ public enum Team {
     @JsonCreator
     public static Team fromString(String value) {
         return Team.valueOf(value.toUpperCase());
-    }
+    }//it is return to avoid serialization error.
 
     @JsonValue
     public String getValue() {

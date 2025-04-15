@@ -1,5 +1,7 @@
 package com.example.cricket_app.service.impl;
 
+import com.example.cricket_app.dto.response.PayOutSummaryResponse;
+import com.example.cricket_app.dto.response.WinnerPayOutInfo;
 import com.example.cricket_app.entity.*;
 import com.example.cricket_app.enums.TransactionType;
 import com.example.cricket_app.exception.WalletNotFoundException;
@@ -32,14 +34,29 @@ public class PayOutServiceImpl implements PayOutService {
     }
 
     @Override
+    public PayOutSummaryResponse processPayout(Match match) {
 
-    public void processPayout(Match match) {
-
-        Optional<Payout> existingPayout = payOutRepository.findByMatch_Id(match.getId());
-
-        if (existingPayout.isPresent()) {
-            throw new IllegalStateException("Payout already processed for this match.");
+        List<Payout> payouts = payOutRepository.findAllByMatch_Id(match.getId());
+        if (payouts.size() > 1) {
+            throw new IllegalStateException("Multiple payouts found for match ID " + match.getId());
         }
+            if (!payouts.isEmpty()) {
+                BigDecimal payoutPerUser = payouts.get(0).getAmount();
+
+                BigDecimal totalLosingPool = BigDecimal.ZERO;
+                for (Payout payout : payouts) {
+                    totalLosingPool = totalLosingPool.add(payout.getAmount());
+                }
+
+                List<WinnerPayOutInfo> winners = payouts.stream().map(p -> {
+                    Users user = p.getUser();
+                    return new WinnerPayOutInfo(user.getId(), user.getFullName(), payoutPerUser);
+                }).toList();
+
+                return new PayOutSummaryResponse(match.getId(), totalLosingPool, payoutPerUser, winners);
+            }
+
+
         List<Bet> allBets = betRepository.findByMatch(match);
 
         List<Bet> winningBets = allBets.stream()
@@ -52,7 +69,7 @@ public class PayOutServiceImpl implements PayOutService {
 
         if (winningBets == null || winningBets.size() == 0) {
             System.out.println("No winning bets to process.");
-            return;
+            // return new PayOutSummaryResponse(match.getId(), BigDecimal.ZERO, BigDecimal.ZERO, List.of());
         }
 
         BigDecimal totalLosingPool = BigDecimal.ZERO;//initializing with 0 for the pool amount.
@@ -67,6 +84,7 @@ public class PayOutServiceImpl implements PayOutService {
                 new BigDecimal(numberOfWinners), 2, RoundingMode.DOWN
         );//amount payout per winner.(2 decimal places,rounding off every number).
 
+        List<WinnerPayOutInfo> winnerInfos = new java.util.ArrayList<>();
         for (Bet bet : winningBets) {
             Users user = bet.getUser();
             Wallet wallet = walletRepository.findByUser(user)
@@ -88,6 +106,8 @@ public class PayOutServiceImpl implements PayOutService {
             payout.setUser(user);
             payout.setAmount(payoutPerWinner);
             payOutRepository.save(payout);
+            winnerInfos.add(new WinnerPayOutInfo(user.getId(), user.getFullName(), payoutPerWinner));
         }
+        return new PayOutSummaryResponse(match.getId(), totalLosingPool, payoutPerWinner, winnerInfos);
     }
 }

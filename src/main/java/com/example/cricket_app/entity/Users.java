@@ -2,7 +2,7 @@ package com.example.cricket_app.entity;
 
 import com.example.cricket_app.enums.UserRole;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;

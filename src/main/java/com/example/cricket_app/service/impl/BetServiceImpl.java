@@ -53,8 +53,8 @@ public class BetServiceImpl implements BetService {
             throw new DuplicateBetException("User already placed a bet for this match.");
         }
 
-        if(match.getStatus()== MatchStatus.ONGOING || match.getStatus() == MatchStatus.COMPLETED){
-              throw new IllegalStateException("Bets are not allowed after the match has started.");
+        if (match.getStatus() == MatchStatus.ONGOING || match.getStatus() == MatchStatus.COMPLETED) {
+            throw new IllegalStateException("Bets are not allowed after the match has started.");
         }
 
         BigDecimal betAmount = match.getBetAmount();

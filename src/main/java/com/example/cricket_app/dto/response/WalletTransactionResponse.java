@@ -1,7 +1,5 @@
 package com.example.cricket_app.dto.response;
 
-import com.example.cricket_app.entity.WalletTransaction;
-import com.example.cricket_app.enums.TransactionType;
 import lombok.Data;
 
 import java.math.BigDecimal;

@@ -2,7 +2,6 @@ package com.example.cricket_app.controller;
 
 import com.example.cricket_app.dto.request.UserRequest;
 import com.example.cricket_app.dto.response.UserResponse;
-import com.example.cricket_app.entity.Users;
 import com.example.cricket_app.service.UserService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -20,7 +19,7 @@ public class UserController {
     @PostMapping()
     @Transactional
     public void CreateUser(@Valid @RequestBody UserRequest userRequest) {
-         userService.saveUser(userRequest);
+        userService.saveUser(userRequest);
     }
 
     @GetMapping()

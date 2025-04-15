@@ -1,6 +1,5 @@
 package com.example.cricket_app.dto.response;
 
-import com.example.cricket_app.entity.Match;
 import com.example.cricket_app.enums.MatchStatus;
 import com.example.cricket_app.enums.Team;
 import lombok.Data;

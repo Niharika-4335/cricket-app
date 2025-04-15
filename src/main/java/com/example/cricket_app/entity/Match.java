@@ -32,7 +32,7 @@ public class Match {
     @Column(name = "start_time")
     private LocalDateTime startTime;
 
-    @Column(name = "bet_amount",precision = 10, scale = 2)
+    @Column(name = "bet_amount", precision = 10, scale = 2)
     private BigDecimal betAmount;
 
     @Enumerated(EnumType.STRING)
@@ -52,8 +52,8 @@ public class Match {
     @OneToMany(mappedBy = "match")
     private Set<Bet> bets = new HashSet<>();
 
-//    @OneToMany(mappedBy = "match")
-//    private Set<Payout> payouts = new HashSet<>();
+    @OneToMany(mappedBy = "match")
+    private Set<Payout> payouts = new HashSet<>();
 
 //    @OneToOne(mappedBy = "match", cascade = CascadeType.ALL)
 //    private MatchPayoutStatus payoutStatus;

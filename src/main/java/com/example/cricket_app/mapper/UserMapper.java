@@ -2,9 +2,7 @@ package com.example.cricket_app.mapper;
 
 import com.example.cricket_app.dto.request.UserRequest;
 import com.example.cricket_app.dto.response.UserResponse;
-import com.example.cricket_app.dto.response.WalletTransactionResponse;
 import com.example.cricket_app.entity.Users;
-import com.example.cricket_app.entity.WalletTransaction;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
