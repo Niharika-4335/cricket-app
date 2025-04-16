@@ -4,6 +4,7 @@ import com.example.cricket_app.dto.response.WalletTransactionResponse;
 import com.example.cricket_app.service.WalletTransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/wallet")
+@RequestMapping("/api/wallet")
 public class WalletTransactionController {
 
     private final WalletTransactionService walletTransactionService;
@@ -23,6 +24,7 @@ public class WalletTransactionController {
     }
 
 
+    @PreAuthorize("hasRole('PLAYER')")
     @GetMapping("/transaction/{userId}")
     public ResponseEntity<List<WalletTransactionResponse>> getTransactionHistory(@PathVariable Long userId) {
         List<WalletTransactionResponse> response = walletTransactionService.getTransactionsByUserId(userId);

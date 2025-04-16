@@ -5,11 +5,9 @@ import com.example.cricket_app.dto.response.WinnerPayOutInfo;
 import com.example.cricket_app.entity.*;
 import com.example.cricket_app.enums.MatchStatus;
 import com.example.cricket_app.enums.TransactionType;
+import com.example.cricket_app.exception.MatchNotFoundException;
 import com.example.cricket_app.exception.WalletNotFoundException;
-import com.example.cricket_app.repository.BetRepository;
-import com.example.cricket_app.repository.PayOutRepository;
-import com.example.cricket_app.repository.WalletRepository;
-import com.example.cricket_app.repository.WalletTransactionRepository;
+import com.example.cricket_app.repository.*;
 import com.example.cricket_app.service.PayOutService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,17 +24,23 @@ public class PayOutServiceImpl implements PayOutService {
     private WalletRepository walletRepository;
     private WalletTransactionRepository walletTransactionRepository;
     private PayOutRepository payOutRepository;
+    private MatchRepository matchRepository;
 
     @Autowired
-    public PayOutServiceImpl(BetRepository betRepository, WalletRepository walletRepository, WalletTransactionRepository walletTransactionRepository, PayOutRepository payOutRepository) {
+    public PayOutServiceImpl(BetRepository betRepository, WalletRepository walletRepository, WalletTransactionRepository walletTransactionRepository, PayOutRepository payOutRepository, MatchRepository matchRepository) {
         this.betRepository = betRepository;
         this.walletRepository = walletRepository;
         this.walletTransactionRepository = walletTransactionRepository;
         this.payOutRepository = payOutRepository;
+        this.matchRepository = matchRepository;
     }
 
     @Override
-    public PayOutSummaryResponse processPayout(Match match) {
+    public PayOutSummaryResponse processPayout(Long matchId) {
+
+        Match match = matchRepository.findById(matchId)
+                .orElseThrow(() -> new MatchNotFoundException("Match not found with ID: " + matchId));
+
 
         if (match.getStatus()!= MatchStatus.COMPLETED) {
             throw new IllegalStateException("Payoutsummary cannot be processed: Match is not completed yet.");

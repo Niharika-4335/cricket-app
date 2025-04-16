@@ -1,55 +1,119 @@
 package com.example.cricket_app.service.impl;
 
-import com.example.cricket_app.dto.request.UserRequest;
+import com.example.cricket_app.dto.request.LoginRequest;
+import com.example.cricket_app.dto.request.SignUpRequest;
+import com.example.cricket_app.dto.response.JwtResponse;
 import com.example.cricket_app.dto.response.UserResponse;
 import com.example.cricket_app.entity.Users;
+import com.example.cricket_app.enums.UserRole;
 import com.example.cricket_app.exception.DuplicateEmailException;
 import com.example.cricket_app.exception.UserNotFoundException;
 import com.example.cricket_app.mapper.UserMapper;
 import com.example.cricket_app.repository.UserRepository;
+import com.example.cricket_app.security.CustomUserDetails;
+import com.example.cricket_app.security.JwtUtils;
 import com.example.cricket_app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private UserMapper  userMapper;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtils jwtUtils;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    private UserMapper userMapper;
-
-    @Autowired
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, AuthenticationManager authenticationManager, JwtUtils jwtUtils, PasswordEncoder passwordEncoder, UserMapper userMapper) {
         this.userRepository = userRepository;
+        this.authenticationManager = authenticationManager;
+        this.jwtUtils = jwtUtils;
+        this.passwordEncoder = passwordEncoder;
+        this.userMapper = userMapper;
     }
 
     @Override
-    public void  saveUser(UserRequest userRequest) {
-        if (userRepository.existsByEmail(userRequest.getEmail())) {
-            throw new DuplicateEmailException("Email already exists: " + userRequest.getEmail());
-        }
-        Users user = userMapper.toEntity(userRequest);
-        userRepository.save(user);
-//        return userMapper.toResponseDto(user);
+    public JwtResponse authenticateUser(LoginRequest loginRequest) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getEmail(),
+                        loginRequest.getPassword()
+                )
+        );
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        String jwt = jwtUtils.generateToken(
+                userDetails.getUsername(),
+                userDetails.getRole().name(),
+                userDetails.getId()
+        );
+
+        JwtResponse response = new JwtResponse();
+        response.setToken(jwt);
+        response.setRole(userDetails.getRole().name());
+
+        return response;
     }
 
+    @Override
+    public ResponseEntity<String> registerUser(SignUpRequest signUpRequest) {
+        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+            throw new DuplicateEmailException("Email is already registered.");
+        }
+
+        Users user = new Users();
+        user.setEmail(signUpRequest.getEmail());
+        user.setFullName(signUpRequest.getFullName());
+        user.setPasswordHash(passwordEncoder.encode(signUpRequest.getPassword()));
+        user.setRole(UserRole.PLAYER);
+        user.setCreatedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
+
+        userRepository.save(user);
+
+        return ResponseEntity.ok("User registered successfully!");
+    }
+
+    @Override
+    public ResponseEntity<String> registerAdmin(SignUpRequest signUpRequest) {
+        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+           throw new DuplicateEmailException("Email is already registered.");
+        }
+
+        Users admin = new Users();
+        admin.setEmail(signUpRequest.getEmail());
+        admin.setFullName(signUpRequest.getFullName());
+        admin.setPasswordHash(passwordEncoder.encode(signUpRequest.getPassword()));
+        admin.setRole(UserRole.ADMIN);
+        admin.setCreatedAt(LocalDateTime.now());
+        admin.setUpdatedAt(LocalDateTime.now());
+
+        userRepository.save(admin);
+
+        return ResponseEntity.ok("Admin registered successfully!");
+    }
 
     @Override
     public List<UserResponse> showUsers() {
-        List<Users> users=userRepository.findAll();
+        List<Users> users=userRepository.findByRole(UserRole.PLAYER);
         return userMapper.toResponseDtoList(users);
     }
 
     @Override
-    public UserResponse findUserById(Long id) {
-        Users user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("user not found"));
+    public UserResponse getUserById(Long id) {
+        Users user = userRepository.findById(id).filter(i->i.getRole()==UserRole.PLAYER).orElseThrow(() -> new UserNotFoundException("user not found"));
         return userMapper.toResponseDto(user);
+    }
 
     }
 
-
-}

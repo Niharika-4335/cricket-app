@@ -5,12 +5,13 @@ import com.example.cricket_app.dto.response.BetResponse;
 import com.example.cricket_app.service.BetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/bet")
+@RequestMapping("/api/bet")
 public class BetController {
     private final BetService betService;
 
@@ -19,12 +20,14 @@ public class BetController {
         this.betService = betService;
     }
 
+    @PreAuthorize("hasRole('PLAYER')")
     @PostMapping("/create")
     public ResponseEntity<String> placeBet(@RequestBody BetRequest request) {
         betService.placeBet(request);
         return ResponseEntity.ok("Bet placed successfully.");
     }
 
+    @PreAuthorize("hasRole('PLAYER')")
     @GetMapping("/history/{userId}")
     public ResponseEntity<List<BetResponse>> getTransactionHistory(@PathVariable Long userId) {
         List<BetResponse> response = betService.getUserBetHistory(userId);

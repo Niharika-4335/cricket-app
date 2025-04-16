@@ -1,36 +1,40 @@
 package com.example.cricket_app.controller;
 
-import com.example.cricket_app.dto.request.UserRequest;
 import com.example.cricket_app.dto.response.UserResponse;
+import com.example.cricket_app.entity.Users;
+import com.example.cricket_app.mapper.UserMapper;
+import com.example.cricket_app.repository.UserRepository;
 import com.example.cricket_app.service.UserService;
-import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 public class UserController {
-    @Autowired
     private UserService userService;
+    private UserMapper  userMapper;
 
-    @PostMapping()
-    @Transactional
-    public void CreateUser(@Valid @RequestBody UserRequest userRequest) {
-        userService.saveUser(userRequest);
+    @Autowired
+    public UserController(UserService userService, UserMapper userMapper) {
+        this.userService = userService;
+        this.userMapper = userMapper;
     }
 
-    @GetMapping()
-    public List<UserResponse> getListOfUsers() {
-        return userService.showUsers();
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
+        return ResponseEntity.ok(userService.showUsers());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
-    public UserResponse getUserById(@PathVariable Long id) {
-        return userService.findUserById(id);
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getUserById(id));
     }
-
 
 }

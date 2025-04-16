@@ -10,13 +10,14 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 
 @RestController
-@RequestMapping("/matches")
+@RequestMapping("/api/matches")
 public class MatchController {
     private MatchService matchService;
 
@@ -25,18 +26,21 @@ public class MatchController {
         this.matchService = matchService;
     }
 
-    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/create-match")
     public ResponseEntity<MatchResponse> createMatch(@Valid @RequestBody CreateMatchRequest request) throws BadRequestException {
         MatchResponse createdMatch = matchService.createMatch(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdMatch);
     }
 
+    @PreAuthorize("hasRole('PLAYER')")
     @GetMapping("/upcoming")
     public ResponseEntity<UpcomingMatchResponse> getUpcomingMatches() {
         UpcomingMatchResponse response = matchService.getUpcomingMatches();
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasRole('PLAYER')")
     @GetMapping("/completed")
     public ResponseEntity<List<PastMatchesResultResponse>> getCompletedMatches() {
         List<PastMatchesResultResponse> pastMatchesResultResponses = matchService.viewPastMatchesResults();

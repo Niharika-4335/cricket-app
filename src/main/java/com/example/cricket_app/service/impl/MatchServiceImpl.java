@@ -102,7 +102,7 @@ public class MatchServiceImpl implements MatchService {
         match.setStatus(MatchStatus.COMPLETED);
         matchRepository.save(match);
         betService.updateBetStatusesForMatchWinner(matchId);
-        payOutService.processPayout(match);
+        payOutService.processPayout(matchId);
 
     }
 

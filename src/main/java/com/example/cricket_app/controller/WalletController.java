@@ -7,10 +7,11 @@ import com.example.cricket_app.service.WalletService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/wallets")
+@RequestMapping("/api/wallets")
 public class WalletController {
     private final WalletService walletService;
 
@@ -19,12 +20,14 @@ public class WalletController {
         this.walletService = walletService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/credit")
     public ResponseEntity<WalletResponse> creditWallet(@Valid @RequestBody CreditWalletRequest request) {
         WalletResponse response = walletService.creditWallet(request);
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasRole('PLAYER')")
     @GetMapping("/balance/{userId}")
     public ResponseEntity<WalletResponse> viewCurrentBalance(@PathVariable Long userId) {
         WalletResponse response = walletService.viewCurrentBalance(userId);
