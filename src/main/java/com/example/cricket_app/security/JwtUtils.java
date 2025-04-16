@@ -15,7 +15,7 @@ import java.util.Date;
 @Component
 public class JwtUtils {
 
-    @Value("${jwt.secret}")
+    @Value("${jwt.secret}")//place-holder sets the value from application context.
     private String jwtSecret;
 
     @Value("${jwt.expirationMs}")
@@ -24,21 +24,22 @@ public class JwtUtils {
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
+    //decoding the secret key and generating a sha-key for to the token.
 
     public String generateToken(String email, String role, Long userId) {
         return Jwts.builder()
-                .setSubject(email)
-                .claim("role", role)
+                .setSubject(email)//like unique identifier.
+                .claim("role", role)// like key-value pairs which we want to use.
                 .claim("userId", userId)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)//it's like a stamp.
                 .compact();
     }
 
     public String getEmailFromToken(String token) {
         return Jwts.parserBuilder().setSigningKey(getSigningKey()).build()
-                .parseClaimsJws(token)
+                .parseClaimsJws(token)//all body header and signature.
                 .getBody()
                 .getSubject();
     }

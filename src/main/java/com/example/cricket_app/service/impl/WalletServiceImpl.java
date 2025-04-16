@@ -5,6 +5,7 @@ import com.example.cricket_app.dto.response.WalletResponse;
 import com.example.cricket_app.entity.Users;
 import com.example.cricket_app.entity.Wallet;
 import com.example.cricket_app.entity.WalletTransaction;
+import com.example.cricket_app.enums.MatchStatus;
 import com.example.cricket_app.enums.TransactionType;
 import com.example.cricket_app.exception.NonPositiveAmountException;
 import com.example.cricket_app.exception.UserNotFoundException;
@@ -13,6 +14,7 @@ import com.example.cricket_app.mapper.WalletTransactionMapper;
 import com.example.cricket_app.repository.UserRepository;
 import com.example.cricket_app.repository.WalletRepository;
 import com.example.cricket_app.repository.WalletTransactionRepository;
+import com.example.cricket_app.security.AuthUtils;
 import com.example.cricket_app.service.WalletService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,10 +59,10 @@ public class WalletServiceImpl implements WalletService {
                     newWallet.setUser(user);
                     newWallet.setBalance(BigDecimal.ZERO);
                     return walletRepository.save(newWallet);
-                });
+                });//saving the wallet with zero balance.
 
         wallet.setBalance(wallet.getBalance().add(creditWalletRequest.getAmount()));
-        walletRepository.save(wallet);
+        walletRepository.save(wallet);//if admins credit money then it will be saved again into DB.
 
         WalletTransaction transaction = new WalletTransaction();
         transaction.setWallet(wallet);
@@ -68,17 +70,18 @@ public class WalletServiceImpl implements WalletService {
         transaction.setTransactionType(TransactionType.ADMIN_CREDIT);
         transaction.setDescription(creditWalletRequest.getDescription());
         transaction.setMatch(null); // Admin credit doesn't need a match
-        walletTransactionRepository.save(transaction);
+        walletTransactionRepository.save(transaction);//after that showing in history .
 
         return walletMapper.toResponseDto(wallet);
     }
 
     @Override
-    public WalletResponse viewCurrentBalance(Long userId) {
+    public WalletResponse viewCurrentBalance() {
+        Long userId = AuthUtils.getLoggedInUserId();
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        Wallet wallet = walletRepository.findById(userId)
+        Wallet wallet = walletRepository.findByUser(user)
                 .orElseGet(() -> {
                     Wallet newWallet = new Wallet();
                     newWallet.setUser(user);

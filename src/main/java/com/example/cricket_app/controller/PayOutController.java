@@ -2,8 +2,6 @@ package com.example.cricket_app.controller;
 
 import com.example.cricket_app.dto.request.DeclareWinnerRequest;
 import com.example.cricket_app.dto.response.PayOutSummaryResponse;
-import com.example.cricket_app.entity.Match;
-import com.example.cricket_app.exception.MatchNotFoundException;
 import com.example.cricket_app.repository.MatchRepository;
 import com.example.cricket_app.service.MatchService;
 import com.example.cricket_app.service.PayOutService;

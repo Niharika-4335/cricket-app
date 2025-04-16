@@ -5,6 +5,7 @@ import com.example.cricket_app.dto.response.WinnerPayOutInfo;
 import com.example.cricket_app.entity.*;
 import com.example.cricket_app.enums.MatchStatus;
 import com.example.cricket_app.enums.TransactionType;
+import com.example.cricket_app.exception.MatchNotCompletedException;
 import com.example.cricket_app.exception.MatchNotFoundException;
 import com.example.cricket_app.exception.WalletNotFoundException;
 import com.example.cricket_app.repository.*;
@@ -43,7 +44,7 @@ public class PayOutServiceImpl implements PayOutService {
 
 
         if (match.getStatus()!= MatchStatus.COMPLETED) {
-            throw new IllegalStateException("Payoutsummary cannot be processed: Match is not completed yet.");
+            throw new MatchNotCompletedException("Payoutsummary cannot be processed: Match is not completed yet.");
         }
 
         List<Payout> payouts = payOutRepository.findAllByMatch_Id(match.getId());

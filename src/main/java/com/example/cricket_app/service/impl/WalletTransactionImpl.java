@@ -13,6 +13,7 @@ import com.example.cricket_app.repository.MatchRepository;
 import com.example.cricket_app.repository.UserRepository;
 import com.example.cricket_app.repository.WalletRepository;
 import com.example.cricket_app.repository.WalletTransactionRepository;
+import com.example.cricket_app.security.AuthUtils;
 import com.example.cricket_app.service.WalletTransactionService;
 import org.springframework.stereotype.Service;
 
@@ -90,7 +91,8 @@ public class WalletTransactionImpl implements WalletTransactionService {
     }
 
     @Override
-    public List<WalletTransactionResponse> getTransactionsByUserId(Long userId) {
+    public List<WalletTransactionResponse> getTransactionsByUserId() {
+        Long userId = AuthUtils.getLoggedInUserId();
         List<WalletTransaction> transactions = walletTransactionRepository
                 .findByWallet_User_IdOrderByCreatedAtDesc(userId);
 

@@ -11,5 +11,5 @@ public interface MatchMapper {
 
     //dto to entity conversion to save into database.
     MatchResponse toResponseDto(Match match);
-    //entity to dto to give to client.
+    //entity to dto to response..
 }

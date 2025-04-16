@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface WalletTransactionRepository extends JpaRepository<WalletTransaction, Long> {
     List<WalletTransaction> findByWallet_User_IdOrderByCreatedAtDesc(Long userId);
 
-    List<WalletTransaction> findByMatch_IdAndTransactionType(Long id, TransactionType transactionType);
+//    List<WalletTransaction> findByMatch_IdAndTransactionType(Long id, TransactionType transactionType);
 
     //here also using nested queries.we get user_id by using wallet.
     //wallet contains user object.therefore wallet_user_id all must be in caps.

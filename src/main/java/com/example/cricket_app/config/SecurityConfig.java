@@ -59,10 +59,10 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS)
         );
-         http.exceptionHandling(exception -> exception.authenticationEntryPoint(authEntryPointJwt));
+        http.exceptionHandling(exception -> exception.authenticationEntryPoint(authEntryPointJwt));
         http.csrf(csrf -> csrf.disable());
-            http.addFilterBefore(authTokenFilter,
-                    UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(authTokenFilter,
+                UsernamePasswordAuthenticationFilter.class);//run authTokenFilter before running the username password.
         return http.build();
     }
 }

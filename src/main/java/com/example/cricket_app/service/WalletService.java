@@ -9,8 +9,8 @@ import java.util.List;
 
 public interface WalletService {
 
-    public WalletResponse creditWallet(CreditWalletRequest creditWalletRequest);
+     WalletResponse creditWallet(CreditWalletRequest creditWalletRequest);
 
-    public WalletResponse viewCurrentBalance(Long userId);
+     WalletResponse viewCurrentBalance();
 
 }

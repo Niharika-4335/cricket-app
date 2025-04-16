@@ -9,7 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface PayOutRepository extends JpaRepository<Payout, Long> {
-    Optional<Payout> findByMatch_Id(Long matchId);
 
     List<Payout> findAllByMatch_Id(Long id);
 

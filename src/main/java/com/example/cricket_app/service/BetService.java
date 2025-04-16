@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface BetService {
 
-    public void placeBet(BetRequest request);
+     void placeBet(BetRequest request);
 
-    public List<BetResponse> getUserBetHistory(Long userId);
+     List<BetResponse> getUserBetHistory();
 
-    public void updateBetStatusesForMatchWinner(Long matchId);
+     void updateBetStatusesForMatchWinner(Long matchId);
 }

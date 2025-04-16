@@ -17,6 +17,7 @@ import java.io.IOException;
 @Component
 public class AuthTokenFilter extends OncePerRequestFilter {
 
+    //OncePerRequestFilter helps in 1 request->filter logic runs only once.
     private JwtUtils jwtUtils;
     private CustomUserDetailsService customUserDetailsService;
 
@@ -31,8 +32,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         try {
             String token = jwtUtils.getJwtFromHeader(request);
             if (token != null && jwtUtils.validateToken(token)) {
-                String email = jwtUtils.getEmailFromToken(token);
-                UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
+                String email = jwtUtils.getEmailFromToken(token);//get email from the token
+                UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);//getting userDetails.
 
                 UsernamePasswordAuthenticationToken auth =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());

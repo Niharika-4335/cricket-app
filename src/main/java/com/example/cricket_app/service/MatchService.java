@@ -9,14 +9,14 @@ import org.apache.coyote.BadRequestException;
 import java.util.List;
 
 public interface MatchService {
-    public MatchResponse createMatch(CreateMatchRequest createMatchRequest) throws BadRequestException;
+     MatchResponse createMatch(CreateMatchRequest createMatchRequest) throws BadRequestException;
 
-    public UpcomingMatchResponse getUpcomingMatches();
+     UpcomingMatchResponse getUpcomingMatches();
 
-    public MatchResponse getMatchById(Long id);
+     MatchResponse getMatchById(Long id);
 
-    public void declareMatchWinner(Long matchId, String winningTeam);
+     void declareMatchWinner(Long matchId, String winningTeam);
 
-    public List<PastMatchesResultResponse> viewPastMatchesResults();
+     List<PastMatchesResultResponse> viewPastMatchesResults();
 
     }

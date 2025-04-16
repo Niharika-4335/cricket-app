@@ -14,6 +14,7 @@ import com.example.cricket_app.mapper.BetMapper;
 import com.example.cricket_app.repository.BetRepository;
 import com.example.cricket_app.repository.MatchRepository;
 import com.example.cricket_app.repository.UserRepository;
+import com.example.cricket_app.security.AuthUtils;
 import com.example.cricket_app.service.BetService;
 import com.example.cricket_app.service.WalletTransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,8 @@ public class BetServiceImpl implements BetService {
 
     @Override
     public void placeBet(BetRequest request) {
-        Users user = userRepository.findById(request.getUserId())
+        Long userId = AuthUtils.getLoggedInUserId();
+        Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         Match match = matchRepository.findById(request.getMatchId())
@@ -96,7 +98,8 @@ public class BetServiceImpl implements BetService {
     }
 
     @Override
-    public List<BetResponse> getUserBetHistory(Long userId) {
+    public List<BetResponse> getUserBetHistory() {
+        Long userId = AuthUtils.getLoggedInUserId();
         List<Bet> bets = betRepository.findByUser_IdOrderByIdDesc(userId);
         return bets.stream()
                 .map(betMapper::toResponse)//betMapper is an object and toResponse refers to the instance method.

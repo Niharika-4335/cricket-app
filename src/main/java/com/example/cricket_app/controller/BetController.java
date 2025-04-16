@@ -28,9 +28,9 @@ public class BetController {
     }
 
     @PreAuthorize("hasRole('PLAYER')")
-    @GetMapping("/history/{userId}")
-    public ResponseEntity<List<BetResponse>> getTransactionHistory(@PathVariable Long userId) {
-        List<BetResponse> response = betService.getUserBetHistory(userId);
+    @GetMapping("/history")
+    public ResponseEntity<List<BetResponse>> getBetHistory() {
+        List<BetResponse> response = betService.getUserBetHistory();
         return ResponseEntity.ok(response);
     }
 }

@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface WalletTransactionService {
 
-    public void creditToWallet(Long userId, BigDecimal amount, String description, TransactionType type, Long matchId);
+     void creditToWallet(Long userId, BigDecimal amount, String description, TransactionType type, Long matchId);
 
-    public void debitFromWallet(Long userId, BigDecimal amount, String description, Long matchId);
+     void debitFromWallet(Long userId, BigDecimal amount, String description, Long matchId);
 
-    public List<WalletTransactionResponse> getTransactionsByUserId(Long userId);
+     List<WalletTransactionResponse> getTransactionsByUserId();
 }

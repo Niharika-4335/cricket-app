@@ -99,6 +99,15 @@ public class GlobalException {
 
         return new ResponseEntity<>(apiError, HttpStatus.NOT_ACCEPTABLE);
     }
+    @ExceptionHandler(MatchNotCompletedException.class)
+    public ResponseEntity<ApiError> handleMatchNotCompletedException(MatchNotCompletedException matchNotCompletedException) {
+
+        ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE.value(), matchNotCompletedException.getMessage(), null);
+
+        return new ResponseEntity<>(apiError, HttpStatus.NOT_ACCEPTABLE);
+    }
+
+
 
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

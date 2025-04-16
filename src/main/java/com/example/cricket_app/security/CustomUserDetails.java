@@ -11,6 +11,9 @@ import java.util.Collection;
 import java.util.List;
 
 @Getter
+
+//my  application has its own Users entity, but Spring Security doesn’t know how to use it.
+//so we create CustomUserDetails and tell spring that get email,password from my user object.
 public class CustomUserDetails implements UserDetails {
     Long id;
     String email;
@@ -27,7 +30,7 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + this.role.name()));
-    }
+    }//granted authority is  an interface implemented by SimpleGrantedAuthority.
 
     @Override
     public String getPassword() {

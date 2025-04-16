@@ -1,5 +1,6 @@
 package com.example.cricket_app.mapper;
 
+import com.example.cricket_app.dto.response.SignUpResponse;
 import com.example.cricket_app.dto.response.UserResponse;
 import com.example.cricket_app.entity.Users;
 import org.mapstruct.Mapper;
@@ -15,5 +16,8 @@ public interface UserMapper {
     //to get information about one user.
 
     @Mapping(source = "wallet.balance", target = "balance")
-    List<UserResponse> toResponseDtoList(List<Users> users);//to get information about all users.
+    List<UserResponse> toResponseDtoList(List<Users> users);//to show wallet balance from wallet.
+
+
+
 }

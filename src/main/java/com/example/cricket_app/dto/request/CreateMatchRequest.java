@@ -18,7 +18,7 @@ public class CreateMatchRequest {
     private String teamB;
 
     @NotNull(message = "Start time is required")
-    @Future(message = "Start time must be in the future")//start time should be in future.
+    @Future(message = "Start time must be in the future")//start time should be in the future.
     private LocalDateTime startTime;
 
     @NotNull(message = "Bet amount is required")

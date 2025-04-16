@@ -3,11 +3,13 @@ package com.example.cricket_app.service.impl;
 import com.example.cricket_app.dto.request.LoginRequest;
 import com.example.cricket_app.dto.request.SignUpRequest;
 import com.example.cricket_app.dto.response.JwtResponse;
+import com.example.cricket_app.dto.response.SignUpResponse;
 import com.example.cricket_app.dto.response.UserResponse;
 import com.example.cricket_app.entity.Users;
 import com.example.cricket_app.enums.UserRole;
 import com.example.cricket_app.exception.DuplicateEmailException;
 import com.example.cricket_app.exception.UserNotFoundException;
+import com.example.cricket_app.mapper.SignUpMapper;
 import com.example.cricket_app.mapper.UserMapper;
 import com.example.cricket_app.repository.UserRepository;
 import com.example.cricket_app.security.CustomUserDetails;
@@ -32,13 +34,15 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
+    private final SignUpMapper signUpMapper;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, AuthenticationManager authenticationManager, JwtUtils jwtUtils, PasswordEncoder passwordEncoder, UserMapper userMapper) {
+    public UserServiceImpl(UserRepository userRepository, AuthenticationManager authenticationManager, JwtUtils jwtUtils, PasswordEncoder passwordEncoder, SignUpMapper signUpMapper, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
         this.passwordEncoder = passwordEncoder;
+        this.signUpMapper = signUpMapper;
         this.userMapper = userMapper;
     }
 
@@ -51,6 +55,7 @@ public class UserServiceImpl implements UserService {
                 )
         );
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        //getPrincipal means the authenticated user
 
         String jwt = jwtUtils.generateToken(
                 userDetails.getUsername(),
@@ -66,7 +71,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<String> registerUser(SignUpRequest signUpRequest) {
+    public SignUpResponse registerUser(SignUpRequest signUpRequest) {
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
             throw new DuplicateEmailException("Email is already registered.");
         }
@@ -81,11 +86,12 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
 
-        return ResponseEntity.ok("User registered successfully!");
+//        return ResponseEntity.ok("User registered successfully!");
+        return signUpMapper.toResponseDto(user);
     }
 
     @Override
-    public ResponseEntity<String> registerAdmin(SignUpRequest signUpRequest) {
+    public SignUpResponse registerAdmin(SignUpRequest signUpRequest) {
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
            throw new DuplicateEmailException("Email is already registered.");
         }
@@ -100,7 +106,7 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(admin);
 
-        return ResponseEntity.ok("Admin registered successfully!");
+        return signUpMapper.toResponseDto(admin);
     }
 
     @Override

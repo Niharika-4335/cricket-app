@@ -25,9 +25,9 @@ public class WalletTransactionController {
 
 
     @PreAuthorize("hasRole('PLAYER')")
-    @GetMapping("/transaction/{userId}")
-    public ResponseEntity<List<WalletTransactionResponse>> getTransactionHistory(@PathVariable Long userId) {
-        List<WalletTransactionResponse> response = walletTransactionService.getTransactionsByUserId(userId);
+    @GetMapping("/transaction")
+    public ResponseEntity<List<WalletTransactionResponse>> getTransactionHistory() {
+        List<WalletTransactionResponse> response = walletTransactionService.getTransactionsByUserId();
         return ResponseEntity.ok(response);
     }
 

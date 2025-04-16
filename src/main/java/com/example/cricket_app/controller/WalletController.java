@@ -28,9 +28,9 @@ public class WalletController {
     }
 
     @PreAuthorize("hasRole('PLAYER')")
-    @GetMapping("/balance/{userId}")
-    public ResponseEntity<WalletResponse> viewCurrentBalance(@PathVariable Long userId) {
-        WalletResponse response = walletService.viewCurrentBalance(userId);
+    @GetMapping("/balance")
+    public ResponseEntity<WalletResponse> viewCurrentBalance() {
+        WalletResponse response = walletService.viewCurrentBalance();
         return ResponseEntity.ok(response);
     }
 
