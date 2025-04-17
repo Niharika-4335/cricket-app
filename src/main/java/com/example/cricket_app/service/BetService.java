@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface BetService {
 
-     void placeBet(BetRequest request);
+     BetResponse placeBet(BetRequest request);
 
      List<BetResponse> getUserBetHistory();
 

@@ -22,9 +22,9 @@ public class BetController {
 
     @PreAuthorize("hasRole('PLAYER')")
     @PostMapping("/create")
-    public ResponseEntity<String> placeBet(@RequestBody BetRequest request) {
-        betService.placeBet(request);
-        return ResponseEntity.ok("Bet placed successfully.");
+    public ResponseEntity<BetResponse> placeBet(@RequestBody BetRequest request) {
+        BetResponse response = betService.placeBet(request);
+        return ResponseEntity.ok(response);
     }
 
     @PreAuthorize("hasRole('PLAYER')")

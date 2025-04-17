@@ -107,6 +107,21 @@ public class GlobalException {
         return new ResponseEntity<>(apiError, HttpStatus.NOT_ACCEPTABLE);
     }
 
+    @ExceptionHandler(AdminNotFoundException.class)
+    public ResponseEntity<ApiError> handleAdminNotFoundException(AdminNotFoundException adminNotFoundException) {
+
+        ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE.value(), adminNotFoundException.getMessage(), null);
+
+        return new ResponseEntity<>(apiError, HttpStatus.NOT_ACCEPTABLE);
+    }
+    @ExceptionHandler(OngoingMatchException.class)
+    public ResponseEntity<ApiError> handleOngoingMatchException(OngoingMatchException ongoingMatchException) {
+
+        ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE.value(), ongoingMatchException.getMessage(), null);
+
+        return new ResponseEntity<>(apiError, HttpStatus.NOT_ACCEPTABLE);
+    }
+
 
 
 

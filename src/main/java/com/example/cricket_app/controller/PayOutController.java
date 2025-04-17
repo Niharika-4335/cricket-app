@@ -32,7 +32,7 @@ public class PayOutController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/payoutSummary/{matchId}")
+    @GetMapping("/payoutSummary")
     public ResponseEntity<PayOutSummaryResponse> getPayoutSummary(@PathVariable Long matchId) {
 
         PayOutSummaryResponse response = payOutService.processPayout(matchId);

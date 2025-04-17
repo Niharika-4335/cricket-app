@@ -47,10 +47,6 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorizeRequests -> authorizeRequests
                 .requestMatchers("/api/auth/**").permitAll()
-//                .requestMatchers("/matches").hasRole("PLAYER")
-//                .requestMatchers("/matches/**").hasAnyRole("PLAYER", "ADMIN")
-//                .requestMatchers("/api/bets/**").hasAnyRole("PLAYER", "ADMIN")
-//                .requestMatchers("/api/wallet/**").hasAnyRole("PLAYER", "ADMIN")
                 .anyRequest().authenticated());
 
         //we don't need to create any session because it is stateless every request

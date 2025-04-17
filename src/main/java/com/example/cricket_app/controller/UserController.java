@@ -1,7 +1,6 @@
 package com.example.cricket_app.controller;
 
 import com.example.cricket_app.dto.response.UserResponse;
-import com.example.cricket_app.mapper.UserMapper;
 import com.example.cricket_app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

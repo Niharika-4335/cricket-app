@@ -1,5 +1,6 @@
 package com.example.cricket_app.service.impl;
 
+import com.example.cricket_app.dto.request.CreateWalletRequest;
 import com.example.cricket_app.dto.request.LoginRequest;
 import com.example.cricket_app.dto.request.SignUpRequest;
 import com.example.cricket_app.dto.response.JwtResponse;
@@ -15,6 +16,7 @@ import com.example.cricket_app.repository.UserRepository;
 import com.example.cricket_app.security.CustomUserDetails;
 import com.example.cricket_app.security.JwtUtils;
 import com.example.cricket_app.service.UserService;
+import com.example.cricket_app.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -35,14 +37,16 @@ public class UserServiceImpl implements UserService {
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
     private final SignUpMapper signUpMapper;
+    private final WalletService walletService;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, AuthenticationManager authenticationManager, JwtUtils jwtUtils, PasswordEncoder passwordEncoder, SignUpMapper signUpMapper, UserMapper userMapper) {
+    public UserServiceImpl(UserRepository userRepository, AuthenticationManager authenticationManager, JwtUtils jwtUtils, PasswordEncoder passwordEncoder, SignUpMapper signUpMapper, WalletService walletService, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
         this.passwordEncoder = passwordEncoder;
         this.signUpMapper = signUpMapper;
+        this.walletService = walletService;
         this.userMapper = userMapper;
     }
 
@@ -85,9 +89,9 @@ public class UserServiceImpl implements UserService {
         user.setUpdatedAt(LocalDateTime.now());
 
         userRepository.save(user);
-
-//        return ResponseEntity.ok("User registered successfully!");
+        walletService.initializeWallet(new CreateWalletRequest(user.getId()));
         return signUpMapper.toResponseDto(user);
+
     }
 
     @Override
@@ -105,7 +109,7 @@ public class UserServiceImpl implements UserService {
         admin.setUpdatedAt(LocalDateTime.now());
 
         userRepository.save(admin);
-
+        walletService.initializeWallet(new CreateWalletRequest(admin.getId()));
         return signUpMapper.toResponseDto(admin);
     }
 

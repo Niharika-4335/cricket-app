@@ -9,6 +9,7 @@ import com.example.cricket_app.enums.BetStatus;
 import com.example.cricket_app.enums.MatchStatus;
 import com.example.cricket_app.exception.DuplicateBetException;
 import com.example.cricket_app.exception.MatchNotFoundException;
+import com.example.cricket_app.exception.OngoingMatchException;
 import com.example.cricket_app.exception.UserNotFoundException;
 import com.example.cricket_app.mapper.BetMapper;
 import com.example.cricket_app.repository.BetRepository;
@@ -43,7 +44,7 @@ public class BetServiceImpl implements BetService {
     }
 
     @Override
-    public void placeBet(BetRequest request) {
+    public BetResponse placeBet(BetRequest request) {
         Long userId = AuthUtils.getLoggedInUserId();
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
@@ -56,7 +57,7 @@ public class BetServiceImpl implements BetService {
         }
 
         if (match.getStatus() == MatchStatus.ONGOING || match.getStatus() == MatchStatus.COMPLETED) {
-            throw new IllegalStateException("Bets are not allowed after the match has started.");
+            throw new OngoingMatchException("Bets are not allowed after the match has started.");
         }
 
         BigDecimal betAmount = match.getBetAmount();
@@ -72,6 +73,9 @@ public class BetServiceImpl implements BetService {
         bet.setStatus(BetStatus.PENDING);
         bet.setCreatedAt(LocalDateTime.now());
         betRepository.save(bet);
+
+        return betMapper.toResponse(bet);
+
     }
 
 

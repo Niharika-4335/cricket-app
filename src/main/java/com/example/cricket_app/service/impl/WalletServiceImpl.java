@@ -1,5 +1,6 @@
 package com.example.cricket_app.service.impl;
 
+import com.example.cricket_app.dto.request.CreateWalletRequest;
 import com.example.cricket_app.dto.request.CreditWalletRequest;
 import com.example.cricket_app.dto.response.WalletResponse;
 import com.example.cricket_app.entity.Users;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Service
 @Transactional
@@ -43,8 +45,26 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public WalletResponse creditWallet(CreditWalletRequest creditWalletRequest) {
+    public WalletResponse initializeWallet(CreateWalletRequest request) {
+        Users user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
+        if (walletRepository.findByUser(user).isPresent()) {
+            return walletMapper.toResponseDto(walletRepository.findByUser(user).get());
+        }
+
+        Wallet wallet = new Wallet();
+        wallet.setUser(user);
+        wallet.setBalance(BigDecimal.ZERO);
+        wallet.setCreatedAt(LocalDateTime.now());
+        wallet.setUpdatedAt(LocalDateTime.now());
+        Wallet savedWallet = walletRepository.save(wallet);
+
+        return walletMapper.toResponseDto(savedWallet);
+    }
+
+    @Override
+    public WalletResponse creditWallet(CreditWalletRequest creditWalletRequest) {
         if (creditWalletRequest.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
             throw new NonPositiveAmountException("Amount must be positive");
         }
@@ -52,17 +72,19 @@ public class WalletServiceImpl implements WalletService {
         Users user = userRepository.findById(creditWalletRequest.getUserId())
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        // Get or create the wallet
         Wallet wallet = walletRepository.findByUser(user)
                 .orElseGet(() -> {
                     Wallet newWallet = new Wallet();
                     newWallet.setUser(user);
                     newWallet.setBalance(BigDecimal.ZERO);
+                    newWallet.setCreatedAt(LocalDateTime.now());
+                    newWallet.setUpdatedAt(LocalDateTime.now());
                     return walletRepository.save(newWallet);
-                });//saving the wallet with zero balance.
+                });
 
         wallet.setBalance(wallet.getBalance().add(creditWalletRequest.getAmount()));
-        walletRepository.save(wallet);//if admins credit money then it will be saved again into DB.
+        wallet.setUpdatedAt(LocalDateTime.now());
+        walletRepository.save(wallet);
 
         WalletTransaction transaction = new WalletTransaction();
         transaction.setWallet(wallet);
@@ -70,7 +92,7 @@ public class WalletServiceImpl implements WalletService {
         transaction.setTransactionType(TransactionType.ADMIN_CREDIT);
         transaction.setDescription(creditWalletRequest.getDescription());
         transaction.setMatch(null); // Admin credit doesn't need a match
-        walletTransactionRepository.save(transaction);//after that showing in history .
+        walletTransactionRepository.save(transaction);
 
         return walletMapper.toResponseDto(wallet);
     }
@@ -86,11 +108,12 @@ public class WalletServiceImpl implements WalletService {
                     Wallet newWallet = new Wallet();
                     newWallet.setUser(user);
                     newWallet.setBalance(BigDecimal.ZERO);
+                    newWallet.setCreatedAt(LocalDateTime.now());
+                    newWallet.setUpdatedAt(LocalDateTime.now());
                     return walletRepository.save(newWallet);
                 });
 
         return walletMapper.toResponseDto(wallet);
-
     }
 
 
