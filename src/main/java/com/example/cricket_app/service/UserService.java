@@ -2,6 +2,7 @@ package com.example.cricket_app.service;
 
 import com.example.cricket_app.dto.request.LoginRequest;
 import com.example.cricket_app.dto.request.SignUpRequest;
+import com.example.cricket_app.dto.response.CompleteUserResponse;
 import com.example.cricket_app.dto.response.JwtResponse;
 import com.example.cricket_app.dto.response.SignUpResponse;
 import com.example.cricket_app.dto.response.UserResponse;
@@ -20,7 +21,7 @@ public interface UserService {
 
      List<UserResponse> showUsers();
 
-     UserResponse getUserById(Long id);
+     CompleteUserResponse getUserById(Long id);
 
 
 }

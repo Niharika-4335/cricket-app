@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,6 +46,13 @@ public class MatchServiceImpl implements MatchService {
     @Override
     @Transactional
     public MatchResponse createMatch(CreateMatchRequest createMatchRequest) throws BadRequestException {
+        try {
+            Team.valueOf(createMatchRequest.getTeamA().toUpperCase());
+            Team.valueOf(createMatchRequest.getTeamB().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new InvalidTeamChosenException("Invalid team name. Must be one of: " + Arrays.toString(Team.values()));
+        }
+
         if (createMatchRequest.getTeamA().equalsIgnoreCase(createMatchRequest.getTeamB())) {
             throw new SameTeamSelectionException("Teams cannot be the same");
         }

@@ -1,5 +1,6 @@
 package com.example.cricket_app.dto.request;
 
+import com.example.cricket_app.enums.Team;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

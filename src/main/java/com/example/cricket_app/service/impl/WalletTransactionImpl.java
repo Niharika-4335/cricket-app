@@ -80,6 +80,7 @@ public class WalletTransactionImpl implements WalletTransactionService {
 
         wallet.setBalance(wallet.getBalance().subtract(amount));
         walletRepository.save(wallet);
+//        System.out.println("✅ Wallet debited. New balance: " + wallet.getBalance());
 
         WalletTransaction transaction = new WalletTransaction();
         transaction.setWallet(wallet);

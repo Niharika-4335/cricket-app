@@ -121,6 +121,21 @@ public class GlobalException {
 
         return new ResponseEntity<>(apiError, HttpStatus.NOT_ACCEPTABLE);
     }
+    @ExceptionHandler(InvalidTeamChosenException.class)
+    public ResponseEntity<ApiError> handleInvalidTeamChosen(InvalidTeamChosenException invalidTeamChosenException) {
+
+        ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE.value(), invalidTeamChosenException.getMessage(), null);
+
+        return new ResponseEntity<>(apiError, HttpStatus.NOT_ACCEPTABLE);
+    }
+    @ExceptionHandler(MatchWinnerNotDeclaredException.class)
+    public ResponseEntity<ApiError> handleMatchWinnerNotDeclaredException(MatchWinnerNotDeclaredException matchWinnerNotDeclaredException) {
+
+        ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE.value(), matchWinnerNotDeclaredException.getMessage(), null);
+
+        return new ResponseEntity<>(apiError, HttpStatus.NOT_ACCEPTABLE);
+    }
+
 
 
 

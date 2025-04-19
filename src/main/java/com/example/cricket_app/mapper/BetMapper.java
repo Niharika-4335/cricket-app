@@ -7,7 +7,7 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface BetMapper {
-    @Mapping(source = "id", target = "betId")
+    @Mapping(source = "user.id", target = "userId")
     @Mapping(source = "match.id", target = "matchId")
     BetResponse toResponse(Bet bet);//we are showing match id from match.
 

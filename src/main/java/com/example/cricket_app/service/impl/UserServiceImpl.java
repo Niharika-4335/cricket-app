@@ -3,16 +3,24 @@ package com.example.cricket_app.service.impl;
 import com.example.cricket_app.dto.request.CreateWalletRequest;
 import com.example.cricket_app.dto.request.LoginRequest;
 import com.example.cricket_app.dto.request.SignUpRequest;
+import com.example.cricket_app.dto.response.CompleteUserResponse;
 import com.example.cricket_app.dto.response.JwtResponse;
 import com.example.cricket_app.dto.response.SignUpResponse;
 import com.example.cricket_app.dto.response.UserResponse;
+import com.example.cricket_app.entity.Bet;
 import com.example.cricket_app.entity.Users;
+import com.example.cricket_app.entity.Wallet;
+import com.example.cricket_app.entity.WalletTransaction;
 import com.example.cricket_app.enums.UserRole;
 import com.example.cricket_app.exception.DuplicateEmailException;
 import com.example.cricket_app.exception.UserNotFoundException;
+import com.example.cricket_app.mapper.BetMapper;
 import com.example.cricket_app.mapper.SignUpMapper;
 import com.example.cricket_app.mapper.UserMapper;
+import com.example.cricket_app.mapper.WalletTransactionMapper;
+import com.example.cricket_app.repository.BetRepository;
 import com.example.cricket_app.repository.UserRepository;
+import com.example.cricket_app.repository.WalletTransactionRepository;
 import com.example.cricket_app.security.CustomUserDetails;
 import com.example.cricket_app.security.JwtUtils;
 import com.example.cricket_app.service.UserService;
@@ -27,27 +35,36 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository userRepository;
-    private UserMapper  userMapper;
-    private final AuthenticationManager authenticationManager;
-    private final JwtUtils jwtUtils;
-    private final PasswordEncoder passwordEncoder;
-    private final SignUpMapper signUpMapper;
-    private final WalletService walletService;
+    private UserRepository userRepository;
+    private UserMapper userMapper;
+    private AuthenticationManager authenticationManager;
+    private JwtUtils jwtUtils;
+    private PasswordEncoder passwordEncoder;
+    private SignUpMapper signUpMapper;
+    private WalletService walletService;
+    private WalletTransactionRepository walletTransactionRepository;
+    private BetRepository betRepository;
+    private WalletTransactionMapper walletTransactionMapper;
+    private BetMapper betMapper;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, AuthenticationManager authenticationManager, JwtUtils jwtUtils, PasswordEncoder passwordEncoder, SignUpMapper signUpMapper, WalletService walletService, UserMapper userMapper) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, AuthenticationManager authenticationManager, JwtUtils jwtUtils, PasswordEncoder passwordEncoder, SignUpMapper signUpMapper, WalletService walletService, WalletTransactionRepository walletTransactionRepository, BetRepository betRepository, WalletTransactionMapper walletTransactionMapper, BetMapper betMapper) {
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
         this.passwordEncoder = passwordEncoder;
         this.signUpMapper = signUpMapper;
         this.walletService = walletService;
-        this.userMapper = userMapper;
+        this.walletTransactionRepository = walletTransactionRepository;
+        this.betRepository = betRepository;
+        this.walletTransactionMapper = walletTransactionMapper;
+        this.betMapper = betMapper;
     }
 
     @Override
@@ -97,7 +114,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public SignUpResponse registerAdmin(SignUpRequest signUpRequest) {
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-           throw new DuplicateEmailException("Email is already registered.");
+            throw new DuplicateEmailException("Email is already registered.");
         }
 
         Users admin = new Users();
@@ -115,15 +132,38 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponse> showUsers() {
-        List<Users> users=userRepository.findByRole(UserRole.PLAYER);
+        List<Users> users = userRepository.findByRole(UserRole.PLAYER);
         return userMapper.toResponseDtoList(users);
     }
 
     @Override
-    public UserResponse getUserById(Long id) {
-        Users user = userRepository.findById(id).filter(i->i.getRole()==UserRole.PLAYER).orElseThrow(() -> new UserNotFoundException("user not found"));
-        return userMapper.toResponseDto(user);
+    public CompleteUserResponse getUserById(Long id) {
+//        Users user = userRepository.findById(id).filter(i->i.getRole()==UserRole.PLAYER).orElseThrow(() -> new UserNotFoundException("user not found"));
+//        return userMapper.toResponseDto(user);
+        Users user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        Wallet wallet = user.getWallet();
+
+        // Fetch transactions
+        List<WalletTransaction> transactions = walletTransactionRepository
+                .findByWallet_User_IdOrderByCreatedAtDesc(id);
+
+        // Fetch bets
+        List<Bet> bets = betRepository.findByUser_IdOrderByIdDesc(id);
+
+        // Map to DTO
+        CompleteUserResponse response = new CompleteUserResponse();
+        response.setId(user.getId());
+        response.setEmail(user.getEmail());
+        response.setFullName(user.getFullName());
+        response.setRole(user.getRole());
+        response.setBalance(wallet.getBalance());
+        response.setTransactions(walletTransactionMapper.toResponseDtoList(transactions));
+        response.setBets(bets.stream().map(betMapper::toResponse).collect(Collectors.toList()));
+
+        return response;
     }
 
-    }
+}
 

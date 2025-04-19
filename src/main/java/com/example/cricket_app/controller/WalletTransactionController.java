@@ -15,7 +15,7 @@ import java.util.List;
 @RequestMapping("/api/wallet")
 public class WalletTransactionController {
 
-    private final WalletTransactionService walletTransactionService;
+    private WalletTransactionService walletTransactionService;
 
     @Autowired
     public WalletTransactionController(WalletTransactionService walletTransactionService) {

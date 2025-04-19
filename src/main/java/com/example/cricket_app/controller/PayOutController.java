@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/payout")
 public class PayOutController {
-    private final MatchService matchService;
-    private final PayOutService payOutService;
-    private final MatchRepository matchRepository;
+    private MatchService matchService;
+    private PayOutService payOutService;
+    private MatchRepository matchRepository;
 
     @Autowired
     public PayOutController(MatchService matchService, PayOutService payOutService, MatchRepository matchRepository) {
@@ -32,7 +32,7 @@ public class PayOutController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/payoutSummary")
+    @GetMapping("/payoutSummary/{matchId}")
     public ResponseEntity<PayOutSummaryResponse> getPayoutSummary(@PathVariable Long matchId) {
 
         PayOutSummaryResponse response = payOutService.processPayout(matchId);

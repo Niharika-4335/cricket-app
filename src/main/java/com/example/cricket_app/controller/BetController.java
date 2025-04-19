@@ -13,7 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/bet")
 public class BetController {
-    private final BetService betService;
+    private BetService betService;
 
     @Autowired
     public BetController(BetService betService) {

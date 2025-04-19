@@ -66,7 +66,7 @@ public class WalletServiceImpl implements WalletService {
     @Override
     public WalletResponse creditWallet(CreditWalletRequest creditWalletRequest) {
         if (creditWalletRequest.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new NonPositiveAmountException("Amount must be positive");
+            throw new NonPositiveAmountException("Amount must be greater than 0");
         }
 
         Users user = userRepository.findById(creditWalletRequest.getUserId())

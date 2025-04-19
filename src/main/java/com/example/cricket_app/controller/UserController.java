@@ -1,5 +1,6 @@
 package com.example.cricket_app.controller;
 
+import com.example.cricket_app.dto.response.CompleteUserResponse;
 import com.example.cricket_app.dto.response.UserResponse;
 import com.example.cricket_app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
+    public ResponseEntity<CompleteUserResponse> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 

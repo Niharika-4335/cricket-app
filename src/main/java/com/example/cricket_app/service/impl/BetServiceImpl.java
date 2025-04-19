@@ -5,52 +5,70 @@ import com.example.cricket_app.dto.response.BetResponse;
 import com.example.cricket_app.entity.Bet;
 import com.example.cricket_app.entity.Match;
 import com.example.cricket_app.entity.Users;
+import com.example.cricket_app.entity.Wallet;
 import com.example.cricket_app.enums.BetStatus;
 import com.example.cricket_app.enums.MatchStatus;
-import com.example.cricket_app.exception.DuplicateBetException;
-import com.example.cricket_app.exception.MatchNotFoundException;
-import com.example.cricket_app.exception.OngoingMatchException;
-import com.example.cricket_app.exception.UserNotFoundException;
+import com.example.cricket_app.exception.*;
 import com.example.cricket_app.mapper.BetMapper;
 import com.example.cricket_app.repository.BetRepository;
 import com.example.cricket_app.repository.MatchRepository;
 import com.example.cricket_app.repository.UserRepository;
+import com.example.cricket_app.repository.WalletRepository;
 import com.example.cricket_app.security.AuthUtils;
 import com.example.cricket_app.service.BetService;
 import com.example.cricket_app.service.WalletTransactionService;
+import com.example.cricket_app.thread.AsyncBet;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service
 public class BetServiceImpl implements BetService {
+    private final Map<Long, Object> userLocks = new ConcurrentHashMap<>();
     private UserRepository userRepository;
     private MatchRepository matchRepository;
     private BetRepository betRepository;
     private WalletTransactionService walletTransactionService;
     private BetMapper betMapper;
+    private AsyncBet asyncBet;
+    private WalletRepository walletRepository;
 
     @Autowired
-    public BetServiceImpl(UserRepository userRepository, MatchRepository matchRepository, BetRepository betRepository, WalletTransactionService walletTransactionService, BetMapper betMapper) {
+    public BetServiceImpl(UserRepository userRepository, MatchRepository matchRepository, BetRepository betRepository, WalletTransactionService walletTransactionService, BetMapper betMapper, WalletRepository walletRepository) {
         this.userRepository = userRepository;
         this.matchRepository = matchRepository;
         this.betRepository = betRepository;
         this.walletTransactionService = walletTransactionService;
         this.betMapper = betMapper;
+        this.walletRepository = walletRepository;
     }
 
     @Override
+    @Transactional
     public BetResponse placeBet(BetRequest request) {
         Long userId = AuthUtils.getLoggedInUserId();
+//        Object lock = userLocks.computeIfAbsent(userId, k -> new Object());
+//        asyncBet.processBetData(userId);
+//        synchronized (lock) {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         Match match = matchRepository.findById(request.getMatchId())
                 .orElseThrow(() -> new MatchNotFoundException("Match not found"));
+
+        String teamChosen = String.valueOf(request.getTeamChosen());
+        String teamA = match.getTeamA();
+        String teamB = match.getTeamB();
+        if (!teamChosen.equalsIgnoreCase(teamA) && !teamChosen.equalsIgnoreCase(teamB)) {
+            throw new InvalidTeamChosenException("Chosen team is not participating in this match.");
+        }
 
         if (betRepository.existsByUserAndMatch(user, match)) {
             throw new DuplicateBetException("User already placed a bet for this match.");
@@ -62,8 +80,17 @@ public class BetServiceImpl implements BetService {
 
         BigDecimal betAmount = match.getBetAmount();
 
+//        try {
+//            System.out.println("Sleeping 10s for user: " + userId + " on match: " + match.getId());
+//            Thread.sleep(10000);
+//        } catch (InterruptedException e) {
+//            Thread.currentThread().interrupt();
+//        }//just trying to keep delay.to test.
+
         walletTransactionService.debitFromWallet(user.getId(), betAmount,
                 "Bet placed on match " + match.getId(), match.getId());
+
+        walletRepository.flush();
 
         Bet bet = new Bet();
         bet.setUser(user);//passing the whole object because we cant only pass the user_id.
@@ -75,7 +102,7 @@ public class BetServiceImpl implements BetService {
         betRepository.save(bet);
 
         return betMapper.toResponse(bet);
-
+//    }
     }
 
 
@@ -85,7 +112,7 @@ public class BetServiceImpl implements BetService {
                 .orElseThrow(() -> new MatchNotFoundException("Match not found"));
 
         if (match.getWinningTeam() == null) {
-            throw new IllegalStateException("Match winner is not declared yet.");
+            throw new MatchWinnerNotDeclaredException("Match winner is not declared yet.");
         }
 
         List<Bet> bets = betRepository.findByMatch_Id(matchId);

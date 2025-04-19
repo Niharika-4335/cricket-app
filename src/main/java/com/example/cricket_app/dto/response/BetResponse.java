@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class BetResponse {
-    private Long betId;
+    private Long userId;
     private Long matchId;
     private String teamChosen;
     private Double amount;
