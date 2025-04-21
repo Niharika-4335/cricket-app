@@ -3,10 +3,7 @@ package com.example.cricket_app.service.impl;
 import com.example.cricket_app.dto.request.CreateWalletRequest;
 import com.example.cricket_app.dto.request.LoginRequest;
 import com.example.cricket_app.dto.request.SignUpRequest;
-import com.example.cricket_app.dto.response.CompleteUserResponse;
-import com.example.cricket_app.dto.response.JwtResponse;
-import com.example.cricket_app.dto.response.SignUpResponse;
-import com.example.cricket_app.dto.response.UserResponse;
+import com.example.cricket_app.dto.response.*;
 import com.example.cricket_app.entity.Bet;
 import com.example.cricket_app.entity.Users;
 import com.example.cricket_app.entity.Wallet;
@@ -26,6 +23,10 @@ import com.example.cricket_app.security.JwtUtils;
 import com.example.cricket_app.service.UserService;
 import com.example.cricket_app.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -131,35 +132,45 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserResponse> showUsers() {
-        List<Users> users = userRepository.findByRole(UserRole.PLAYER);
-        return userMapper.toResponseDtoList(users);
+    public PagedUserResponse showUsers(int page, int size, String sortBy, String direction) {
+        int pageNumber = Math.max(0, page - 1);
+        //pageRequest is 0 indexing.but we want page=1 so to align we subtracted.
+        int pageSize = Math.max(1, size);
+        //page size is atleast 1 that's why started from 1.
+        //Direction is  enum{asc,desc}.
+
+        Sort.Direction sortDirection = Sort.Direction.fromString(direction);
+        //fromString is case-insensitive it takes string as/desc and converts into enum constant.
+        //Sort is class.Direction is static enum.fromString is a static method.
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, sortBy));
+
+        Page<Users> usersPage = userRepository.findByRole(UserRole.PLAYER, pageable);
+        List<UserResponse> userDtos = usersPage.map(userMapper::toResponseDto).getContent();
+
+        return new PagedUserResponse(
+                userDtos,//object
+                usersPage.getNumber() + 1, //for readability  of users.// convert back to 1-based
+                usersPage.getTotalPages(),
+                usersPage.getTotalElements()
+        );
     }
 
     @Override
-    public CompleteUserResponse getUserById(Long id) {
-//        Users user = userRepository.findById(id).filter(i->i.getRole()==UserRole.PLAYER).orElseThrow(() -> new UserNotFoundException("user not found"));
-//        return userMapper.toResponseDto(user);
+    public CompleteUserResponse getUserById(Long id,Pageable pageable) {
         Users user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         Wallet wallet = user.getWallet();
-
-        // Fetch transactions
-        List<WalletTransaction> transactions = walletTransactionRepository
-                .findByWallet_User_IdOrderByCreatedAtDesc(id);
-
-        // Fetch bets
+        Page<WalletTransaction> transactions = walletTransactionRepository
+                .findByWallet_User_IdOrderByCreatedAtDesc(id,pageable);
         List<Bet> bets = betRepository.findByUser_IdOrderByIdDesc(id);
-
-        // Map to DTO
         CompleteUserResponse response = new CompleteUserResponse();
         response.setId(user.getId());
         response.setEmail(user.getEmail());
         response.setFullName(user.getFullName());
         response.setRole(user.getRole());
         response.setBalance(wallet.getBalance());
-        response.setTransactions(walletTransactionMapper.toResponseDtoList(transactions));
+        response.setTransactions(walletTransactionMapper.toResponseDtoList(transactions.getContent()));
         response.setBets(bets.stream().map(betMapper::toResponse).collect(Collectors.toList()));
 
         return response;

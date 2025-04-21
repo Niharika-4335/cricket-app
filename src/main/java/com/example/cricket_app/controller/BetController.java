@@ -2,13 +2,14 @@ package com.example.cricket_app.controller;
 
 import com.example.cricket_app.dto.request.BetRequest;
 import com.example.cricket_app.dto.response.BetResponse;
+import com.example.cricket_app.dto.response.PagedBetResponse;
 import com.example.cricket_app.service.BetService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/bet")
@@ -20,6 +21,7 @@ public class BetController {
         this.betService = betService;
     }
 
+
     @PreAuthorize("hasRole('PLAYER')")
     @PostMapping("/create")
     public ResponseEntity<BetResponse> placeBet(@RequestBody BetRequest request) {
@@ -27,10 +29,15 @@ public class BetController {
         return ResponseEntity.ok(response);
     }
 
+
     @PreAuthorize("hasRole('PLAYER')")
     @GetMapping("/history")
-    public ResponseEntity<List<BetResponse>> getBetHistory() {
-        List<BetResponse> response = betService.getUserBetHistory();
-        return ResponseEntity.ok(response);
+    public PagedBetResponse getBetHistory(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String direction)
+    {
+       return betService.getUserBetHistory(page,size,sortBy,direction);
     }
 }

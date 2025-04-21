@@ -1,5 +1,6 @@
 package com.example.cricket_app.service.impl;
 
+import com.example.cricket_app.dto.response.PagedWalletTransactionResponse;
 import com.example.cricket_app.dto.response.WalletTransactionResponse;
 import com.example.cricket_app.entity.Match;
 import com.example.cricket_app.entity.Wallet;
@@ -15,10 +16,13 @@ import com.example.cricket_app.repository.WalletRepository;
 import com.example.cricket_app.repository.WalletTransactionRepository;
 import com.example.cricket_app.security.AuthUtils;
 import com.example.cricket_app.service.WalletTransactionService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -80,7 +84,7 @@ public class WalletTransactionImpl implements WalletTransactionService {
 
         wallet.setBalance(wallet.getBalance().subtract(amount));
         walletRepository.save(wallet);
-//        System.out.println("✅ Wallet debited. New balance: " + wallet.getBalance());
+//        System.out.println("Wallet debited. New balance: " + wallet.getBalance());
 
         WalletTransaction transaction = new WalletTransaction();
         transaction.setWallet(wallet);
@@ -92,13 +96,22 @@ public class WalletTransactionImpl implements WalletTransactionService {
     }
 
     @Override
-    public List<WalletTransactionResponse> getTransactionsByUserId() {
+    public PagedWalletTransactionResponse getTransactionsByUserId(int page, int size, String sortBy, String direction) {
+        int pageNumber = Math.max(0, page - 1);
+        int pageSize = Math.max(1, size);
+        Sort.Direction sortDirection = Sort.Direction.fromString(direction);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, sortBy));
         Long userId = AuthUtils.getLoggedInUserId();
-        List<WalletTransaction> transactions = walletTransactionRepository
-                .findByWallet_User_IdOrderByCreatedAtDesc(userId);
+        Page<WalletTransaction> transactions = walletTransactionRepository
+                .findByWallet_User_IdOrderByCreatedAtDesc(userId, pageable);
 
-        //(List<WalletTransaction>) transactions.stream().sorted()
-        return walletTransactionMapper.toResponseDtoList(transactions);
+        List<WalletTransactionResponse> transactionDtos = transactions.map(walletTransactionMapper::toResponseDto).getContent();
+        return new PagedWalletTransactionResponse(
+                transactionDtos,//object
+                transactions.getNumber() + 1,
+                transactions.getTotalPages(),
+                transactions.getTotalElements()//they came from age<WalletTransaction> transactions .
+        );
     }
 
 

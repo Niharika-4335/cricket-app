@@ -8,6 +8,8 @@ import com.example.cricket_app.service.MatchService;
 import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,9 +37,9 @@ public class MatchController {
 
     @PreAuthorize("hasRole('PLAYER')")
     @GetMapping("/upcoming")
-    public ResponseEntity<UpcomingMatchResponse> getUpcomingMatches() {
-        UpcomingMatchResponse response = matchService.getUpcomingMatches();
-        return ResponseEntity.ok(response);
+    public Page<UpcomingMatchResponse> getUpcomingMatches(Pageable pageable) {
+        return matchService.getUpcomingMatches(pageable);
+
     }
 
     @PreAuthorize("hasRole('PLAYER')")

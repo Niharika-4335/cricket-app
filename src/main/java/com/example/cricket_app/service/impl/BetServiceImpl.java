@@ -2,6 +2,7 @@ package com.example.cricket_app.service.impl;
 
 import com.example.cricket_app.dto.request.BetRequest;
 import com.example.cricket_app.dto.response.BetResponse;
+import com.example.cricket_app.dto.response.PagedBetResponse;
 import com.example.cricket_app.entity.Bet;
 import com.example.cricket_app.entity.Match;
 import com.example.cricket_app.entity.Users;
@@ -20,6 +21,10 @@ import com.example.cricket_app.service.WalletTransactionService;
 import com.example.cricket_app.thread.AsyncBet;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -80,12 +85,12 @@ public class BetServiceImpl implements BetService {
 
         BigDecimal betAmount = match.getBetAmount();
 
-//        try {
-//            System.out.println("Sleeping 10s for user: " + userId + " on match: " + match.getId());
-//            Thread.sleep(10000);
-//        } catch (InterruptedException e) {
-//            Thread.currentThread().interrupt();
-//        }//just trying to keep delay.to test.
+        try {
+            System.out.println("Sleeping 10s for user: " + userId + " on match: " + match.getId());
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }//just trying to keep delay.to test.
 
         walletTransactionService.debitFromWallet(user.getId(), betAmount,
                 "Bet placed on match " + match.getId(), match.getId());
@@ -129,11 +134,20 @@ public class BetServiceImpl implements BetService {
     }
 
     @Override
-    public List<BetResponse> getUserBetHistory() {
+    public PagedBetResponse getUserBetHistory(int page, int size, String sortBy, String direction) {
+        int pageNumber = Math.max(0, page - 1);
+        int pageSize = Math.max(1, size);
+        Sort.Direction sortDirection = Sort.Direction.fromString(direction);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, sortBy));
         Long userId = AuthUtils.getLoggedInUserId();
-        List<Bet> bets = betRepository.findByUser_IdOrderByIdDesc(userId);
-        return bets.stream()
-                .map(betMapper::toResponse)//betMapper is an object and toResponse refers to the instance method.
-                .collect(Collectors.toList());
+        Page<Bet> bets = betRepository.findByUser_IdOrderByIdDesc(userId,pageable);
+        List<BetResponse> betResponseList= bets.map(betMapper::toResponse).getContent();
+        //betMapper is an object and toResponse refers to the instance method
+        return new PagedBetResponse(
+                betResponseList,
+                bets.getNumber()+1,
+                bets.getTotalPages(),
+                bets.getTotalElements()
+        );
     }
 }

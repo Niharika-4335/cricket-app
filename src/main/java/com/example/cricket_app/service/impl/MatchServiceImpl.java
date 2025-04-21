@@ -17,12 +17,15 @@ import com.example.cricket_app.service.PayOutService;
 import jakarta.transaction.Transactional;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -70,19 +73,18 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public UpcomingMatchResponse getUpcomingMatches() {
-        List<Match> matches = matchRepository.findUpcomingMatches(LocalDateTime.now());
+    public Page<UpcomingMatchResponse> getUpcomingMatches(Pageable pageable) {
+        Page<Match> matches = matchRepository.findUpcomingMatches(LocalDateTime.now(), pageable);
+        List<UpcomingMatchResponse> upcomingMatchResponses = new ArrayList<>();
 
-        List<MatchResponse> matchResponses = new ArrayList<>();
-        for (Match match : matches) {
-            MatchResponse response = matchMapper.toResponseDto(match);
-            matchResponses.add(response);
+        for (Match match : matches.getContent()) {
+            MatchResponse matchResponse = matchMapper.toResponseDto(match);
+            UpcomingMatchResponse upcomingMatchResponse = new UpcomingMatchResponse();
+            upcomingMatchResponse.setMatches(Collections.singletonList(matchResponse));
+            upcomingMatchResponses.add(upcomingMatchResponse);
         }
+        return new PageImpl<>(upcomingMatchResponses, pageable, matches.getTotalElements());
 
-        UpcomingMatchResponse response = new UpcomingMatchResponse();
-        response.setMatches(matchResponses);
-
-        return response;
     }
 
     @Override

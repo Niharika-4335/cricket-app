@@ -2,14 +2,11 @@ package com.example.cricket_app.service;
 
 import com.example.cricket_app.dto.request.LoginRequest;
 import com.example.cricket_app.dto.request.SignUpRequest;
-import com.example.cricket_app.dto.response.CompleteUserResponse;
-import com.example.cricket_app.dto.response.JwtResponse;
-import com.example.cricket_app.dto.response.SignUpResponse;
-import com.example.cricket_app.dto.response.UserResponse;
-import com.example.cricket_app.entity.Users;
-import org.springframework.http.ResponseEntity;
-
-import java.util.List;
+import com.example.cricket_app.dto.response.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+//import org.springframework.data.domain.Page;
+//import org.springframework.data.domain.Pageable;
 
 public interface UserService {
 
@@ -19,9 +16,9 @@ public interface UserService {
 
     SignUpResponse registerAdmin(SignUpRequest signUpRequest);
 
-     List<UserResponse> showUsers();
+     PagedUserResponse showUsers(int page, int size, String sortBy, String direction);
 
-     CompleteUserResponse getUserById(Long id);
+     CompleteUserResponse getUserById(Long id,Pageable pageable);
 
 
 }
