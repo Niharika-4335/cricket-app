@@ -15,12 +15,6 @@ import java.util.Optional;
 public interface WalletTransactionRepository extends JpaRepository<WalletTransaction, Long> {
     Page<WalletTransaction> findByWallet_User_IdOrderByCreatedAtDesc(Long userId, Pageable pageable);
 
-//    List<WalletTransaction> findByMatch_IdAndTransactionType(Long id, TransactionType transactionType);
-
-    //here also using nested queries.we get user_id by using wallet.
-    //wallet contains user object.therefore wallet_user_id all must be in caps.
-
-
 
 
 

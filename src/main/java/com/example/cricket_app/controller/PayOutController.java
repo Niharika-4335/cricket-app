@@ -6,7 +6,6 @@ import com.example.cricket_app.repository.MatchRepository;
 import com.example.cricket_app.service.MatchService;
 import com.example.cricket_app.service.PayOutService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,10 +32,8 @@ public class PayOutController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/payoutSummary/{matchId}")
-    public ResponseEntity<PayOutSummaryResponse> getPayoutSummary(@PathVariable Long matchId) {
-
-        PayOutSummaryResponse response = payOutService.processPayout(matchId);
-        return ResponseEntity.ok(response);
+    public PayOutSummaryResponse getPayoutSummary(@PathVariable Long matchId) {
+        return payOutService.processPayout(matchId);
     }
 
 

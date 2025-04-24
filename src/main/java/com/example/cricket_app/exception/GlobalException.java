@@ -99,6 +99,7 @@ public class GlobalException {
 
         return new ResponseEntity<>(apiError, HttpStatus.NOT_ACCEPTABLE);
     }
+
     @ExceptionHandler(MatchNotCompletedException.class)
     public ResponseEntity<ApiError> handleMatchNotCompletedException(MatchNotCompletedException matchNotCompletedException) {
 
@@ -114,6 +115,7 @@ public class GlobalException {
 
         return new ResponseEntity<>(apiError, HttpStatus.NOT_ACCEPTABLE);
     }
+
     @ExceptionHandler(OngoingMatchException.class)
     public ResponseEntity<ApiError> handleOngoingMatchException(OngoingMatchException ongoingMatchException) {
 
@@ -121,6 +123,7 @@ public class GlobalException {
 
         return new ResponseEntity<>(apiError, HttpStatus.NOT_ACCEPTABLE);
     }
+
     @ExceptionHandler(InvalidTeamChosenException.class)
     public ResponseEntity<ApiError> handleInvalidTeamChosen(InvalidTeamChosenException invalidTeamChosenException) {
 
@@ -128,6 +131,7 @@ public class GlobalException {
 
         return new ResponseEntity<>(apiError, HttpStatus.NOT_ACCEPTABLE);
     }
+
     @ExceptionHandler(MatchWinnerNotDeclaredException.class)
     public ResponseEntity<ApiError> handleMatchWinnerNotDeclaredException(MatchWinnerNotDeclaredException matchWinnerNotDeclaredException) {
 
@@ -136,9 +140,13 @@ public class GlobalException {
         return new ResponseEntity<>(apiError, HttpStatus.NOT_ACCEPTABLE);
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> handleRunTimeException(Exception exception) {
 
+        ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE.value(), exception.getMessage(), null);
 
-
+        return new ResponseEntity<>(apiError, HttpStatus.NOT_ACCEPTABLE);
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {

@@ -2,8 +2,8 @@ package com.example.cricket_app.service.impl;
 
 import com.example.cricket_app.dto.request.CreateMatchRequest;
 import com.example.cricket_app.dto.response.MatchResponse;
+import com.example.cricket_app.dto.response.PagedUpcomingMatchResponse;
 import com.example.cricket_app.dto.response.PastMatchesResultResponse;
-import com.example.cricket_app.dto.response.UpcomingMatchResponse;
 import com.example.cricket_app.entity.Match;
 import com.example.cricket_app.enums.MatchStatus;
 import com.example.cricket_app.enums.Team;
@@ -18,14 +18,11 @@ import jakarta.transaction.Transactional;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,10 +46,11 @@ public class MatchServiceImpl implements MatchService {
     @Override
     @Transactional
     public MatchResponse createMatch(CreateMatchRequest createMatchRequest) throws BadRequestException {
+        //getting two teams names and checking whether they are in our enum or not.
         try {
             Team.valueOf(createMatchRequest.getTeamA().toUpperCase());
             Team.valueOf(createMatchRequest.getTeamB().toUpperCase());
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidTeamChosenException e) {
             throw new InvalidTeamChosenException("Invalid team name. Must be one of: " + Arrays.toString(Team.values()));
         }
 
@@ -73,26 +71,20 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public Page<UpcomingMatchResponse> getUpcomingMatches(Pageable pageable) {
+    public PagedUpcomingMatchResponse getUpcomingMatches(Pageable pageable) {
         Page<Match> matches = matchRepository.findUpcomingMatches(LocalDateTime.now(), pageable);
-        List<UpcomingMatchResponse> upcomingMatchResponses = new ArrayList<>();
+        List<MatchResponse> matchResponses = matches.getContent()//we use get content to retrieve data from page.
+                .stream()
+                .map(matchMapper::toResponseDto)
+                .collect(Collectors.toList());
 
-        for (Match match : matches.getContent()) {
-            MatchResponse matchResponse = matchMapper.toResponseDto(match);
-            UpcomingMatchResponse upcomingMatchResponse = new UpcomingMatchResponse();
-            upcomingMatchResponse.setMatches(Collections.singletonList(matchResponse));
-            upcomingMatchResponses.add(upcomingMatchResponse);
-        }
-        return new PageImpl<>(upcomingMatchResponses, pageable, matches.getTotalElements());
+        return new PagedUpcomingMatchResponse(
+                matchResponses,
+                matches.getNumber() + 1,
+                matches.getTotalPages(),
+                matches.getTotalElements()
+        );
 
-    }
-
-    @Override
-    public MatchResponse getMatchById(Long id) {
-        Match match = matchRepository.findById(id)
-                .orElseThrow(() -> new MatchNotFoundException("match not found"));
-
-        return matchMapper.toResponseDto(match);
     }
 
     @Override
@@ -107,7 +99,14 @@ public class MatchServiceImpl implements MatchService {
         if (match.getStartTime().isAfter(LocalDateTime.now())) {
             throw new MatchNotStartedException("Cannot declare winner before match starts.");
         }
-        Team winningTeamEnum = Team.valueOf(winningTeam); //valueOf converts String to Enum
+        Team winningTeamEnum = Team.valueOf(winningTeam);//valueOf converts String to Enum
+
+        if (!(match.getTeamA().equalsIgnoreCase(winningTeam) ||
+                match.getTeamB().equalsIgnoreCase(winningTeam))) {
+            throw new InvalidTeamChosenException("Winning team must be one of the teams that played the match.");
+        }
+
+
         match.setWinningTeam(winningTeamEnum);
         match.setStatus(MatchStatus.COMPLETED);
         matchRepository.save(match);
@@ -139,15 +138,15 @@ public class MatchServiceImpl implements MatchService {
             matchRepository.save(match);
         }//to change the status if time passed from the present time now.
 
-//        List<Match> toComplete = matchRepository.findAll().stream()
-//                .filter(m -> m.getStatus() == MatchStatus.ONGOING && m.getStartTime().plusMinutes(5).isBefore(now))
-//                .collect(Collectors.toList());
-//
-//        for (Match match : toComplete) {
-//            match.setStatus(MatchStatus.COMPLETED);
-//            match.setUpdatedAt(now);
-//            matchRepository.save(match);
-//        }//after 5 minutes...match will be completed.
+        List<Match> toComplete = matchRepository.findAll().stream()
+                .filter(m -> m.getStatus() == MatchStatus.ONGOING && m.getStartTime().plusMinutes(20).isBefore(now))
+                .collect(Collectors.toList());
+
+        for (Match match : toComplete) {
+            match.setStatus(MatchStatus.AUTO_COMPLETED);
+            match.setUpdatedAt(now);
+            matchRepository.save(match);
+        }//after 20 minutes...match will be completed even if we place bets or not.match  will get auto completed.
 
     }
 

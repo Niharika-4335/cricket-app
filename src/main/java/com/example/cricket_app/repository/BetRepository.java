@@ -22,6 +22,7 @@ public interface BetRepository extends JpaRepository<Bet, Long> {
 
     List<Bet> findByMatch_Id(Long matchId);
 
+
     Page<Bet> findByUser_IdOrderByIdDesc(Long userId, Pageable pageable);
 
 }

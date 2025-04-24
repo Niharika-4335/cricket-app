@@ -9,13 +9,13 @@ import java.time.LocalDateTime;
 
 @Data
 public class MatchResponse {
-    private Long id;
+    private Long matchId;
     private String teamA;
     private String teamB;
     private LocalDateTime startTime;
     private BigDecimal betAmount;
     private MatchStatus status;
-    private Team winningTeam;
+//    private Team winningTeam;
 
 
 }

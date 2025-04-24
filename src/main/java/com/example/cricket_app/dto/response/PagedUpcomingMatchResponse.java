@@ -7,8 +7,8 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class PagedPayOutSummaryResponse {
-    private List<PayOutSummaryResponse> payOutSummaryResponses;
+public class PagedUpcomingMatchResponse {
+    private List<MatchResponse> matches;
     private int currentPage;
     private int totalPages;
     private long totalUsers;

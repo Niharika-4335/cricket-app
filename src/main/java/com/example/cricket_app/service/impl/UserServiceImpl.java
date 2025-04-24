@@ -27,7 +27,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -127,7 +126,7 @@ public class UserServiceImpl implements UserService {
         admin.setUpdatedAt(LocalDateTime.now());
 
         userRepository.save(admin);
-        walletService.initializeWallet(new CreateWalletRequest(admin.getId()));
+        walletService.initializeWallet(new CreateWalletRequest(admin.getId()));//initializing a wallet by giving a id from here.
         return signUpMapper.toResponseDto(admin);
     }
 
@@ -156,13 +155,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public CompleteUserResponse getUserById(Long id,Pageable pageable) {
+    public CompleteUserResponse getUserById(Long id, Pageable pageable) {
+
         Users user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         Wallet wallet = user.getWallet();
         Page<WalletTransaction> transactions = walletTransactionRepository
-                .findByWallet_User_IdOrderByCreatedAtDesc(id,pageable);
+                .findByWallet_User_IdOrderByCreatedAtDesc(id, pageable);
+
+        List<WalletTransactionResponse> transactionDtos =
+                transactions.map(walletTransactionMapper::toResponseDto).getContent();
+        PagedWalletTransactionResponse pagedWalletTransactionResponse = new PagedWalletTransactionResponse(
+                transactionDtos,
+                transactions.getNumber() + 1,
+                transactions.getTotalPages(),
+                transactions.getTotalElements()
+        );
         List<Bet> bets = betRepository.findByUser_IdOrderByIdDesc(id);
         CompleteUserResponse response = new CompleteUserResponse();
         response.setId(user.getId());
@@ -170,7 +179,7 @@ public class UserServiceImpl implements UserService {
         response.setFullName(user.getFullName());
         response.setRole(user.getRole());
         response.setBalance(wallet.getBalance());
-        response.setTransactions(walletTransactionMapper.toResponseDtoList(transactions.getContent()));
+        response.setPagedWalletTransactionResponse(pagedWalletTransactionResponse);
         response.setBets(bets.stream().map(betMapper::toResponse).collect(Collectors.toList()));
 
         return response;

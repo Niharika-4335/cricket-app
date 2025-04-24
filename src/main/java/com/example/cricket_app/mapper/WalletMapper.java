@@ -8,6 +8,6 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface WalletMapper {
 
-    @Mapping(target = "id", source = "user.id")
+    @Mapping(target = "userId", source = "user.id")
     WalletResponse toResponseDto(Wallet wallet);
 }

@@ -14,16 +14,13 @@ import java.util.Optional;
 
 @Repository
 public interface WalletRepository extends JpaRepository<Wallet, Long> {
-    Optional<Wallet> findByUserId(Long userId);
-
     Optional<Wallet> findByUser(Users user);
 
     @Query("SELECT u FROM Users u WHERE u.role = 'ADMIN'")
     Optional<Users> findAdminUser();
 
-//    @Lock(LockModeType.PESSIMISTIC_WRITE)
-//    @Query("SELECT w FROM Wallet w WHERE w.user.id = :userId")
-//    Optional<Wallet> findByUserIdForUpdate(@Param("userId") Long userId);
-
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT w FROM Wallet w WHERE w.user.id = :userId")
+    Optional<Wallet> findByUserIdForUpdate(@Param("userId") Long userId);
 
 }

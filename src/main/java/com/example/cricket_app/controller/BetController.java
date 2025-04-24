@@ -5,8 +5,7 @@ import com.example.cricket_app.dto.response.BetResponse;
 import com.example.cricket_app.dto.response.PagedBetResponse;
 import com.example.cricket_app.service.BetService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +25,8 @@ public class BetController {
     @PostMapping("/create")
     public ResponseEntity<BetResponse> placeBet(@RequestBody BetRequest request) {
         BetResponse response = betService.placeBet(request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-
 
     @PreAuthorize("hasRole('PLAYER')")
     @GetMapping("/history")
@@ -36,8 +34,7 @@ public class BetController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "DESC") String direction)
-    {
-       return betService.getUserBetHistory(page,size,sortBy,direction);
+            @RequestParam(defaultValue = "DESC") String direction) {
+        return betService.getUserBetHistory(page, size, sortBy, direction);
     }
 }

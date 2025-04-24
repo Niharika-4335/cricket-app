@@ -13,7 +13,6 @@ public class CompleteUserResponse {
     private String fullName;
     private UserRole role;
     private BigDecimal balance;
-
-    private List<WalletTransactionResponse> transactions;
+    private PagedWalletTransactionResponse pagedWalletTransactionResponse;
     private List<BetResponse> bets;
 }

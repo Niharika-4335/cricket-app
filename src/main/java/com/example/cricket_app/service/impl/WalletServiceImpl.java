@@ -6,10 +6,10 @@ import com.example.cricket_app.dto.response.WalletResponse;
 import com.example.cricket_app.entity.Users;
 import com.example.cricket_app.entity.Wallet;
 import com.example.cricket_app.entity.WalletTransaction;
-import com.example.cricket_app.enums.MatchStatus;
 import com.example.cricket_app.enums.TransactionType;
 import com.example.cricket_app.exception.NonPositiveAmountException;
 import com.example.cricket_app.exception.UserNotFoundException;
+import com.example.cricket_app.exception.WalletNotFoundException;
 import com.example.cricket_app.mapper.WalletMapper;
 import com.example.cricket_app.mapper.WalletTransactionMapper;
 import com.example.cricket_app.repository.UserRepository;
@@ -49,6 +49,7 @@ public class WalletServiceImpl implements WalletService {
         Users user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
+        //if wallet is already present we are getting it by using wallet repository method.
         if (walletRepository.findByUser(user).isPresent()) {
             return walletMapper.toResponseDto(walletRepository.findByUser(user).get());
         }
@@ -104,14 +105,7 @@ public class WalletServiceImpl implements WalletService {
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         Wallet wallet = walletRepository.findByUser(user)
-                .orElseGet(() -> {
-                    Wallet newWallet = new Wallet();
-                    newWallet.setUser(user);
-                    newWallet.setBalance(BigDecimal.ZERO);
-                    newWallet.setCreatedAt(LocalDateTime.now());
-                    newWallet.setUpdatedAt(LocalDateTime.now());
-                    return walletRepository.save(newWallet);
-                });
+                .orElseThrow(() -> new WalletNotFoundException("Wallet not found"));
 
         return walletMapper.toResponseDto(wallet);
     }

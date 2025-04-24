@@ -7,6 +7,6 @@ import java.math.BigDecimal;
 @Data
 public class WalletResponse {
 
-    private Long id;
+    private Long userId;
     private BigDecimal balance;
 }

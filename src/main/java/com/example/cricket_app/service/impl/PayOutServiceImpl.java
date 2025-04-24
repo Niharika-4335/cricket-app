@@ -98,33 +98,17 @@ public class PayOutServiceImpl implements PayOutService {
             return new PayOutSummaryResponse(match.getId(), totalLosingPool, BigDecimal.ZERO, List.of());
         }
 
-        // if all are winners.bet amount will be refunded.
+        // if all are winners.now wins.
         if (losingBets.isEmpty()) {
-            for (Bet bet : winningBets) {
-                Users user = bet.getUser();
-                Wallet wallet = walletRepository.findByUser(user)
-                        .orElseThrow(() -> new WalletNotFoundException("Wallet not found"));
 
-                wallet.setBalance(wallet.getBalance().add(bet.getAmount()));
-                walletRepository.save(wallet);
-
-                WalletTransaction transaction = new WalletTransaction();
-                transaction.setWallet(wallet);
-                transaction.setAmount(bet.getAmount());
-                transaction.setTransactionType(TransactionType.BET_REFUND);
-                transaction.setDescription("Refund due to no losers in match " + match.getId());
-                transaction.setMatch(match);
-                walletTransactionRepository.save(transaction);
-            }
-
-            List<WinnerPayOutInfo> refundInfos = winningBets.stream()
-                    .map(b -> new WinnerPayOutInfo(
-                            b.getUser().getId(),
-                            b.getUser().getFullName(),
-                            b.getAmount()))
+            List<WinnerPayOutInfo> winners = winningBets.stream()
+                    .map(bet -> new WinnerPayOutInfo(
+                            bet.getUser().getId(),
+                            bet.getUser().getFullName(),
+                            BigDecimal.ZERO // No payout, just return winners with 0
+                    ))
                     .toList();
-
-            return new PayOutSummaryResponse(match.getId(), BigDecimal.ZERO, BigDecimal.ZERO, refundInfos);
+            return new PayOutSummaryResponse(match.getId(), BigDecimal.ZERO, BigDecimal.ZERO, winners);
         }
 
         //  Admin-20% won players-80%.
@@ -135,10 +119,9 @@ public class PayOutServiceImpl implements PayOutService {
 
 
         BigDecimal adminCut = totalLosingPool.multiply(new BigDecimal("0.05")).setScale(2, RoundingMode.DOWN);
-        //20%of loosing pool to admin.
         BigDecimal distributableAmount = totalLosingPool.subtract(adminCut);
 
-        // credit to admin
+        // crediting to admin
         Users admin = walletRepository.findAdminUser()
                 .orElseThrow(() -> new AdminNotFoundException("Admin not found"));
         Wallet adminWallet = walletRepository.findByUser(admin)
@@ -188,4 +171,31 @@ public class PayOutServiceImpl implements PayOutService {
 
         return new PayOutSummaryResponse(match.getId(), totalLosingPool, payoutPerWinner, winnerInfos);
     }
+
+//    @Override
+//    public PagedPayOutSummaryResponse getAllPayoutSummaries(int page, int size, String sortBy, String direction) {
+//        int pageNumber = Math.max(0, page - 1);
+//        int pageSize = Math.max(1, size);
+//        Sort.Direction sortDirection = Sort.Direction.fromString(direction);
+//        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, sortBy));
+//
+//        // Fetch matches that are COMPLETED
+//        Page<Match> completedMatches = matchRepository.findAllByStatus(MatchStatus.COMPLETED, pageable);
+//
+//        List<PayOutSummaryResponse> summaries = new ArrayList<>();
+//
+//        for (Match match : completedMatches.getContent()) {
+//            try {
+//                summaries.add(processPayout(match.getId()));
+//            } catch (Exception ex) {
+//            }
+//        }
+//
+//        return new PagedPayOutSummaryResponse(
+//                summaries,
+//                completedMatches.getNumber()+ 1,
+//                completedMatches.getTotalPages(),
+//                completedMatches.getTotalElements()
+//        );
+//    }
 }

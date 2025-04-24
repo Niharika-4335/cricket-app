@@ -10,7 +10,6 @@ public class BetResponse {
     private Long matchId;
     private String teamChosen;
     private Double amount;
-    private String status;
     private LocalDateTime createdAt;
 
 }
