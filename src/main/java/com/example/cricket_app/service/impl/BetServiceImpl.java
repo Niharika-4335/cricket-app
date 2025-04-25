@@ -19,7 +19,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -48,9 +47,12 @@ public class BetServiceImpl implements BetService {
 
     @Override
     @Transactional
-//    @Transactional(isolation = Isolation.SERIALIZABLE)
+//  @Transactional(isolation = Isolation.READ_COMMITTED)
     public BetResponse placeBet(BetRequest request) {
         Long userId = AuthUtils.getLoggedInUserId();
+        Wallet wallet = walletRepository.findByUserIdForUpdate(userId)
+                .orElseThrow(() -> new WalletNotFoundException("Wallet not found for user " + userId));
+
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
@@ -71,14 +73,7 @@ public class BetServiceImpl implements BetService {
         if (match.getStatus() == MatchStatus.ONGOING || match.getStatus() == MatchStatus.COMPLETED) {
             throw new OngoingMatchException("Bets are not allowed after the match has started.");
         }
-        return placeBetTransaction(user, match, teamChosen);
-    }
-
-    @Transactional(isolation = Isolation.READ_COMMITTED)
-    private BetResponse placeBetTransaction(Users user, Match match, String teamChosen) {
-        Wallet wallet = walletRepository.findByUserIdForUpdate(user.getId())
-                .orElseThrow(() -> new WalletNotFoundException("Wallet not found for user " + user.getId()));
-
+//        return placeBetTransaction(user, match, teamChosen);
         BigDecimal betAmount = match.getBetAmount();
         BigDecimal currentBalance = wallet.getBalance();
         System.out.println(currentBalance);
@@ -112,7 +107,48 @@ public class BetServiceImpl implements BetService {
         bet.setCreatedAt(LocalDateTime.now());
         betRepository.save(bet);
         return betMapper.toResponse(bet);
+
     }
+
+//    @Transactional
+//    private BetResponse placeBetTransaction(Users user, Match match, String teamChosen) {
+//        Wallet wallet = walletRepository.findByUserIdForUpdate(user.getId())
+//                .orElseThrow(() -> new WalletNotFoundException("Wallet not found for user " + user.getId()));
+//
+//        BigDecimal betAmount = match.getBetAmount();
+//        BigDecimal currentBalance = wallet.getBalance();
+//        System.out.println(currentBalance);
+//        if (currentBalance == null || currentBalance.compareTo(betAmount) < 0) {
+//            throw new InsufficientBalanceException("Not enough funds to place this bet.");
+//        }
+//        try {
+//            System.out.println("Sleeping 10s for user: " + user.getId() + " on match: " + match.getId());
+//            Thread.sleep(10000);
+//        } catch (InterruptedException e) {
+//            Thread.currentThread().interrupt();
+//        }
+//        BigDecimal remainingBalance = currentBalance.subtract(betAmount);
+//        wallet.setBalance(remainingBalance);
+//        System.out.println(remainingBalance);
+//        walletRepository.save(wallet);
+//
+//        WalletTransaction transaction = new WalletTransaction();
+//        transaction.setWallet(wallet);
+//        transaction.setAmount(betAmount);
+//        transaction.setTransactionType(TransactionType.BET_PLACED);
+//        transaction.setDescription("Bet placed on match " + match.getId());
+//        transaction.setMatch(match);
+//        walletTransactionRepository.save(transaction);
+//        Bet bet = new Bet();
+//        bet.setUser(user);
+//        bet.setMatch(match);
+//        bet.setTeamChosen(Team.valueOf(teamChosen));
+//        bet.setAmount(betAmount);
+//        bet.setStatus(BetStatus.PENDING);
+//        bet.setCreatedAt(LocalDateTime.now());
+//        betRepository.save(bet);
+//        return betMapper.toResponse(bet);
+//    }
 
 
     @Override
