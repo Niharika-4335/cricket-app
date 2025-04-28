@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/wallet")
 public class WalletTransactionController {
 
-    private WalletTransactionService walletTransactionService;
+    private  final WalletTransactionService walletTransactionService;
 
     @Autowired
     public WalletTransactionController(WalletTransactionService walletTransactionService) {

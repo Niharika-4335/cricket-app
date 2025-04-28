@@ -126,7 +126,7 @@ public class UserServiceImpl implements UserService {
         admin.setUpdatedAt(LocalDateTime.now());
 
         userRepository.save(admin);
-        walletService.initializeWallet(new CreateWalletRequest(admin.getId()));//initializing a wallet by giving a id from here.
+        walletService.initializeWallet(new CreateWalletRequest(admin.getId()));//initializing a wallet by giving an id from here.
         return signUpMapper.toResponseDto(admin);
     }
 
@@ -135,7 +135,7 @@ public class UserServiceImpl implements UserService {
         int pageNumber = Math.max(0, page - 1);
         //pageRequest is 0 indexing.but we want page=1 so to align we subtracted.
         int pageSize = Math.max(1, size);
-        //page size is atleast 1 that's why started from 1.
+        //page size should be at-least 1 that's why started from 1.
         //Direction is  enum{asc,desc}.
 
         Sort.Direction sortDirection = Sort.Direction.fromString(direction);
@@ -150,6 +150,7 @@ public class UserServiceImpl implements UserService {
                 userDtos,//object
                 usersPage.getNumber() + 1, //for readability  of users.// convert back to 1-based
                 usersPage.getTotalPages(),
+
                 usersPage.getTotalElements()
         );
     }

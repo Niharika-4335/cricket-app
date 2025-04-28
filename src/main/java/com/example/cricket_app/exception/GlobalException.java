@@ -131,7 +131,13 @@ public class GlobalException {
 
         return new ResponseEntity<>(apiError, HttpStatus.NOT_ACCEPTABLE);
     }
+    @ExceptionHandler(PayoutNotFoundException.class)
+    public ResponseEntity<ApiError> handlePayoutNotFound(PayoutNotFoundException payoutNotFoundException) {
 
+        ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE.value(),payoutNotFoundException.getMessage(), null);
+
+        return new ResponseEntity<>(apiError, HttpStatus.NOT_ACCEPTABLE);
+    }
     @ExceptionHandler(MatchWinnerNotDeclaredException.class)
     public ResponseEntity<ApiError> handleMatchWinnerNotDeclaredException(MatchWinnerNotDeclaredException matchWinnerNotDeclaredException) {
 

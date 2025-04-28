@@ -4,17 +4,20 @@ import com.example.cricket_app.dto.request.CreateMatchRequest;
 import com.example.cricket_app.dto.response.MatchResponse;
 import com.example.cricket_app.dto.response.PagedUpcomingMatchResponse;
 import com.example.cricket_app.dto.response.PastMatchesResultResponse;
+import com.example.cricket_app.dto.response.PayoutResponse;
 import com.example.cricket_app.entity.Match;
+import com.example.cricket_app.entity.Payout;
 import com.example.cricket_app.enums.MatchStatus;
 import com.example.cricket_app.enums.Team;
 import com.example.cricket_app.exception.*;
 import com.example.cricket_app.mapper.MatchMapper;
 import com.example.cricket_app.mapper.PastMatchesResultMapper;
+import com.example.cricket_app.mapper.PayOutMapper;
 import com.example.cricket_app.repository.MatchRepository;
+import com.example.cricket_app.repository.PayOutRepository;
 import com.example.cricket_app.service.BetService;
 import com.example.cricket_app.service.MatchService;
 import com.example.cricket_app.service.PayOutService;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,18 +36,22 @@ public class MatchServiceImpl implements MatchService {
     private final PayOutService payOutService;
     private final PastMatchesResultMapper pastMatchesResultMapper;
     private final BetService betService;
+    private final PayOutMapper payOutMapper;
+    private final PayOutRepository payOutRepository;
 
     @Autowired
-    public MatchServiceImpl(MatchRepository matchRepository, MatchMapper matchMapper, PayOutService payOutService, PastMatchesResultMapper pastMatchesResultMapper, BetService betService) {
+    public MatchServiceImpl(MatchRepository matchRepository, MatchMapper matchMapper, PayOutService payOutService, PastMatchesResultMapper pastMatchesResultMapper, BetService betService, PayOutMapper payOutMapper, PayOutRepository payOutRepository) {
         this.matchRepository = matchRepository;
         this.matchMapper = matchMapper;
         this.payOutService = payOutService;
         this.pastMatchesResultMapper = pastMatchesResultMapper;
         this.betService = betService;
+        this.payOutMapper = payOutMapper;
+        this.payOutRepository = payOutRepository;
     }
 
     @Override
-    public MatchResponse createMatch(CreateMatchRequest createMatchRequest) throws BadRequestException {
+    public MatchResponse createMatch(CreateMatchRequest createMatchRequest){
         //getting two teams names and checking whether they are in our enum or not.
         try {
             Team.valueOf(createMatchRequest.getTeamA().toUpperCase());
@@ -65,8 +72,8 @@ public class MatchServiceImpl implements MatchService {
         Match match = matchMapper.toEntity(createMatchRequest);
         Match savedMatch = matchRepository.save(match);
 
-        MatchResponse matchResponse = matchMapper.toResponseDto(savedMatch);
-        return matchResponse;
+        return matchMapper.toResponseDto(savedMatch);
+
     }
 
     @Override
@@ -87,7 +94,7 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public void declareMatchWinner(Long matchId, String winningTeam) {
+    public List<PayoutResponse> declareMatchWinner(Long matchId, String winningTeam) {
         Match match = matchRepository.findById(matchId)
                 .orElseThrow(() -> new MatchNotFoundException("Match not found"));
 
@@ -111,7 +118,15 @@ public class MatchServiceImpl implements MatchService {
         matchRepository.save(match);
         betService.updateBetStatusesForMatchWinner(matchId);
         payOutService.processPayout(matchId);
+        List<Payout> payouts = payOutRepository.findAllByMatch_Id(matchId);
 
+        if (payouts.isEmpty()) {
+            throw new PayoutNotFoundException("No payouts found after processing payout!");
+        }
+
+        return payouts.stream()
+                .map(payOutMapper::toResponse)
+                .toList();
     }
 
     @Override
@@ -126,10 +141,10 @@ public class MatchServiceImpl implements MatchService {
     @Scheduled(fixedRate = 60000)//in milliseconds=1 min
     public void updateMatchStatuses() {
         LocalDateTime now = LocalDateTime.now();
-        // Find matches that are UPCOMING but should be ONGOING
+        // Find matches that are Upcoming but should be Ongoing.
         List<Match> matches = matchRepository.findAll().stream()
                 .filter(m -> m.getStatus() == MatchStatus.UPCOMING && m.getStartTime().isBefore(now))
-                .collect(Collectors.toList());
+                .toList();
 
         for (Match match : matches) {
             match.setStatus(MatchStatus.ONGOING);
@@ -139,7 +154,7 @@ public class MatchServiceImpl implements MatchService {
 
         List<Match> toComplete = matchRepository.findAll().stream()
                 .filter(m -> m.getStatus() == MatchStatus.ONGOING && m.getStartTime().plusMinutes(20).isBefore(now))
-                .collect(Collectors.toList());
+                .toList();
 
         for (Match match : toComplete) {
             match.setStatus(MatchStatus.AUTO_COMPLETED);

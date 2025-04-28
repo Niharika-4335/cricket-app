@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/bet")
 public class BetController {
-    private BetService betService;
+    private final BetService betService;
 
     @Autowired
     public BetController(BetService betService) {

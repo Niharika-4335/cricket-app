@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/matches")
 public class MatchController {
-    private MatchService matchService;
+    private final MatchService matchService;
 
     @Autowired
     public MatchController(MatchService matchService) {
@@ -48,6 +48,8 @@ public class MatchController {
         return ResponseEntity.ok(pastMatchesResultResponses);
 
     }
+
+
 
 
 }

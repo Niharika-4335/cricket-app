@@ -59,7 +59,7 @@ public class PayOutServiceImpl implements PayOutService {
     }
 
     private PayOutSummaryResponse getExistingPayoutSummary(List<Payout> payouts, Match match) {
-        BigDecimal payoutPerUser = payouts.get(0).getAmount();//as the payout per user is same.so we can use get(0).
+        BigDecimal payoutPerUser = payouts.getFirst().getAmount();//as the payout per user is same.so we can use get(0).
         BigDecimal totalLosingPool = payouts.stream()
                 .map(Payout::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);//(start value,accumulator(sums up the value by adding).
@@ -94,7 +94,7 @@ public class PayOutServiceImpl implements PayOutService {
     private PayOutSummaryResponse handleNoWinners(Match match, List<Bet> losingBets) {
         BigDecimal totalLosingPool = losingBets.stream()
                 .map(Bet::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);//no winners means admin will get full money.
+                .reduce(BigDecimal.ZERO, BigDecimal::add);//no winners mean admin will get full money.
 
         Users admin = walletRepository.findAdminUser()
                 .orElseThrow(() -> new AdminNotFoundException("Admin not found"));

@@ -11,7 +11,6 @@ import com.example.cricket_app.exception.NonPositiveAmountException;
 import com.example.cricket_app.exception.UserNotFoundException;
 import com.example.cricket_app.exception.WalletNotFoundException;
 import com.example.cricket_app.mapper.WalletMapper;
-import com.example.cricket_app.mapper.WalletTransactionMapper;
 import com.example.cricket_app.repository.UserRepository;
 import com.example.cricket_app.repository.WalletRepository;
 import com.example.cricket_app.repository.WalletTransactionRepository;

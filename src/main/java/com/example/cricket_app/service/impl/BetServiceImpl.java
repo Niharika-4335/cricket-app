@@ -73,22 +73,9 @@ public class BetServiceImpl implements BetService {
         if (match.getStatus() == MatchStatus.ONGOING || match.getStatus() == MatchStatus.COMPLETED) {
             throw new OngoingMatchException("Bets are not allowed after the match has started.");
         }
-//        return placeBetTransaction(user, match, teamChosen);
         BigDecimal betAmount = match.getBetAmount();
-        BigDecimal currentBalance = wallet.getBalance();
-//        System.out.println(currentBalance);
-        if (currentBalance == null || currentBalance.compareTo(betAmount) < 0) {
-            throw new InsufficientBalanceException("Not enough funds to place this bet.");
-        }
-//        try {
-//            System.out.println("Sleeping 10s for user: " + user.getId() + " on match: " + match.getId());
-//            Thread.sleep(10000);
-//        } catch (InterruptedException e) {
-//            Thread.currentThread().interrupt();
-//        }
-        BigDecimal remainingBalance = currentBalance.subtract(betAmount);
+        BigDecimal remainingBalance = getBigDecimal(wallet, betAmount);
         wallet.setBalance(remainingBalance);
-        System.out.println(remainingBalance);
         walletRepository.save(wallet);
 
         WalletTransaction transaction = new WalletTransaction();
@@ -108,6 +95,20 @@ public class BetServiceImpl implements BetService {
         betRepository.save(bet);
         return betMapper.toResponse(bet);
 
+    }
+
+    private static BigDecimal getBigDecimal(Wallet wallet, BigDecimal betAmount) {
+        BigDecimal currentBalance = wallet.getBalance();
+        if (currentBalance == null || currentBalance.compareTo(betAmount) < 0) {
+            throw new InsufficientBalanceException("Not enough funds to place this bet.");
+        }
+//        try {
+//            System.out.println("Sleeping 10s for user: " + user.getId() + " on match: " + match.getId());
+//            Thread.sleep(10000);
+//        } catch (InterruptedException e) {
+//            Thread.currentThread().interrupt();
+//        }
+        return currentBalance.subtract(betAmount);
     }
 
 
