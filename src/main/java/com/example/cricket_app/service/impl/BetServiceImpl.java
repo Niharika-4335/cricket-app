@@ -13,12 +13,13 @@ import com.example.cricket_app.mapper.BetMapper;
 import com.example.cricket_app.repository.*;
 import com.example.cricket_app.security.AuthUtils;
 import com.example.cricket_app.service.BetService;
-import com.example.cricket_app.service.WalletTransactionService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -27,27 +28,26 @@ import java.util.List;
 
 @Service
 public class BetServiceImpl implements BetService {
-    private UserRepository userRepository;
-    private MatchRepository matchRepository;
-    private BetRepository betRepository;
-    private WalletTransactionService walletTransactionService;
-    private BetMapper betMapper;
-    private WalletRepository walletRepository;
-    private WalletTransactionRepository walletTransactionRepository;
+    private final UserRepository userRepository;
+    private final MatchRepository matchRepository;
+    private final BetRepository betRepository;
+    private final BetMapper betMapper;
+    private final WalletRepository walletRepository;
+    private final WalletTransactionRepository walletTransactionRepository;
 
-    public BetServiceImpl(UserRepository userRepository, MatchRepository matchRepository, BetRepository betRepository, WalletTransactionService walletTransactionService, BetMapper betMapper, WalletRepository walletRepository, WalletTransactionRepository walletTransactionRepository) {
+    @Autowired
+    public BetServiceImpl(UserRepository userRepository, MatchRepository matchRepository, BetRepository betRepository, BetMapper betMapper, WalletRepository walletRepository, WalletTransactionRepository walletTransactionRepository) {
         this.userRepository = userRepository;
         this.matchRepository = matchRepository;
         this.betRepository = betRepository;
-        this.walletTransactionService = walletTransactionService;
         this.betMapper = betMapper;
         this.walletRepository = walletRepository;
         this.walletTransactionRepository = walletTransactionRepository;
     }
 
     @Override
-    @Transactional
-//  @Transactional(isolation = Isolation.READ_COMMITTED)
+//    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public BetResponse placeBet(BetRequest request) {
         Long userId = AuthUtils.getLoggedInUserId();
         Wallet wallet = walletRepository.findByUserIdForUpdate(userId)
@@ -76,16 +76,16 @@ public class BetServiceImpl implements BetService {
 //        return placeBetTransaction(user, match, teamChosen);
         BigDecimal betAmount = match.getBetAmount();
         BigDecimal currentBalance = wallet.getBalance();
-        System.out.println(currentBalance);
+//        System.out.println(currentBalance);
         if (currentBalance == null || currentBalance.compareTo(betAmount) < 0) {
             throw new InsufficientBalanceException("Not enough funds to place this bet.");
         }
-        try {
-            System.out.println("Sleeping 10s for user: " + user.getId() + " on match: " + match.getId());
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+//        try {
+//            System.out.println("Sleeping 10s for user: " + user.getId() + " on match: " + match.getId());
+//            Thread.sleep(10000);
+//        } catch (InterruptedException e) {
+//            Thread.currentThread().interrupt();
+//        }
         BigDecimal remainingBalance = currentBalance.subtract(betAmount);
         wallet.setBalance(remainingBalance);
         System.out.println(remainingBalance);
@@ -109,46 +109,6 @@ public class BetServiceImpl implements BetService {
         return betMapper.toResponse(bet);
 
     }
-
-//    @Transactional
-//    private BetResponse placeBetTransaction(Users user, Match match, String teamChosen) {
-//        Wallet wallet = walletRepository.findByUserIdForUpdate(user.getId())
-//                .orElseThrow(() -> new WalletNotFoundException("Wallet not found for user " + user.getId()));
-//
-//        BigDecimal betAmount = match.getBetAmount();
-//        BigDecimal currentBalance = wallet.getBalance();
-//        System.out.println(currentBalance);
-//        if (currentBalance == null || currentBalance.compareTo(betAmount) < 0) {
-//            throw new InsufficientBalanceException("Not enough funds to place this bet.");
-//        }
-//        try {
-//            System.out.println("Sleeping 10s for user: " + user.getId() + " on match: " + match.getId());
-//            Thread.sleep(10000);
-//        } catch (InterruptedException e) {
-//            Thread.currentThread().interrupt();
-//        }
-//        BigDecimal remainingBalance = currentBalance.subtract(betAmount);
-//        wallet.setBalance(remainingBalance);
-//        System.out.println(remainingBalance);
-//        walletRepository.save(wallet);
-//
-//        WalletTransaction transaction = new WalletTransaction();
-//        transaction.setWallet(wallet);
-//        transaction.setAmount(betAmount);
-//        transaction.setTransactionType(TransactionType.BET_PLACED);
-//        transaction.setDescription("Bet placed on match " + match.getId());
-//        transaction.setMatch(match);
-//        walletTransactionRepository.save(transaction);
-//        Bet bet = new Bet();
-//        bet.setUser(user);
-//        bet.setMatch(match);
-//        bet.setTeamChosen(Team.valueOf(teamChosen));
-//        bet.setAmount(betAmount);
-//        bet.setStatus(BetStatus.PENDING);
-//        bet.setCreatedAt(LocalDateTime.now());
-//        betRepository.save(bet);
-//        return betMapper.toResponse(bet);
-//    }
 
 
     @Override

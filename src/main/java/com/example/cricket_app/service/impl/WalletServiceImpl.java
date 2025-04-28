@@ -28,20 +28,19 @@ import java.time.LocalDateTime;
 @Transactional
 public class WalletServiceImpl implements WalletService {
 
-    private WalletMapper walletMapper;
-    private WalletRepository walletRepository;
-    private UserRepository userRepository;
-    private WalletTransactionRepository walletTransactionRepository;
-    private WalletTransactionMapper walletTransactionMapper;
+    private final  WalletMapper walletMapper;
+    private final WalletRepository walletRepository;
+    private  final UserRepository userRepository;
+    private final WalletTransactionRepository walletTransactionRepository;
 
 
     @Autowired
-    public WalletServiceImpl(WalletMapper walletMapper, WalletRepository walletRepository, UserRepository userRepository, WalletTransactionRepository walletTransactionRepository, WalletTransactionMapper walletTransactionMapper) {
+    public WalletServiceImpl(WalletMapper walletMapper, WalletRepository walletRepository, UserRepository userRepository, WalletTransactionRepository walletTransactionRepository) {
         this.walletMapper = walletMapper;
         this.walletRepository = walletRepository;
         this.userRepository = userRepository;
         this.walletTransactionRepository = walletTransactionRepository;
-        this.walletTransactionMapper = walletTransactionMapper;
+
     }
 
     @Override

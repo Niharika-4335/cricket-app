@@ -40,17 +40,17 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private UserRepository userRepository;
-    private UserMapper userMapper;
-    private AuthenticationManager authenticationManager;
-    private JwtUtils jwtUtils;
-    private PasswordEncoder passwordEncoder;
-    private SignUpMapper signUpMapper;
-    private WalletService walletService;
-    private WalletTransactionRepository walletTransactionRepository;
-    private BetRepository betRepository;
-    private WalletTransactionMapper walletTransactionMapper;
-    private BetMapper betMapper;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtils jwtUtils;
+    private final PasswordEncoder passwordEncoder;
+    private final SignUpMapper signUpMapper;
+    private final WalletService walletService;
+    private final WalletTransactionRepository walletTransactionRepository;
+    private final BetRepository betRepository;
+    private final WalletTransactionMapper walletTransactionMapper;
+    private final BetMapper betMapper;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, AuthenticationManager authenticationManager, JwtUtils jwtUtils, PasswordEncoder passwordEncoder, SignUpMapper signUpMapper, WalletService walletService, WalletTransactionRepository walletTransactionRepository, BetRepository betRepository, WalletTransactionMapper walletTransactionMapper, BetMapper betMapper) {

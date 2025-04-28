@@ -14,13 +14,13 @@ import com.example.cricket_app.repository.MatchRepository;
 import com.example.cricket_app.service.BetService;
 import com.example.cricket_app.service.MatchService;
 import com.example.cricket_app.service.PayOutService;
-import jakarta.transaction.Transactional;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -28,11 +28,11 @@ import java.util.stream.Collectors;
 
 @Service
 public class MatchServiceImpl implements MatchService {
-    private MatchRepository matchRepository;
-    private MatchMapper matchMapper;
-    private PayOutService payOutService;
-    private PastMatchesResultMapper pastMatchesResultMapper;
-    private BetService betService;
+    private final MatchRepository matchRepository;
+    private final MatchMapper matchMapper;
+    private final PayOutService payOutService;
+    private final PastMatchesResultMapper pastMatchesResultMapper;
+    private final BetService betService;
 
     @Autowired
     public MatchServiceImpl(MatchRepository matchRepository, MatchMapper matchMapper, PayOutService payOutService, PastMatchesResultMapper pastMatchesResultMapper, BetService betService) {
@@ -44,7 +44,6 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    @Transactional
     public MatchResponse createMatch(CreateMatchRequest createMatchRequest) throws BadRequestException {
         //getting two teams names and checking whether they are in our enum or not.
         try {
@@ -118,7 +117,7 @@ public class MatchServiceImpl implements MatchService {
     @Override
     public List<PastMatchesResultResponse> viewPastMatchesResults() {
         List<Match> matches = matchRepository.findAll().stream()
-                .filter(m -> m.getStatus() == MatchStatus.COMPLETED).collect(Collectors.toUnmodifiableList());
+                .filter(m -> m.getStatus() == MatchStatus.COMPLETED).toList();
 
         return pastMatchesResultMapper.toResponseDtoList(matches);//returning completed matches as lists
     }

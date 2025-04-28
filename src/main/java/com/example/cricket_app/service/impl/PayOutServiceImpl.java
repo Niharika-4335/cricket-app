@@ -102,6 +102,7 @@ public class PayOutServiceImpl implements PayOutService {
         Wallet adminWallet = walletRepository.findByUser(admin)
                 .orElseThrow(() -> new WalletNotFoundException("Admin wallet not found"));
 
+
         adminWallet.setBalance(adminWallet.getBalance().add(totalLosingPool));
         walletRepository.save(adminWallet);
 
@@ -112,6 +113,12 @@ public class PayOutServiceImpl implements PayOutService {
         adminTxn.setDescription("Full losing pool taken by admin (no winners) for match " + match.getId());
         adminTxn.setMatch(match);
         walletTransactionRepository.save(adminTxn);
+
+        Payout adminPayout = new Payout();
+        adminPayout.setMatch(match);
+        adminPayout.setUser(admin);
+        adminPayout.setAmount(totalLosingPool);
+        payOutRepository.save(adminPayout);
 
         return new PayOutSummaryResponse(match.getId(), totalLosingPool, BigDecimal.ZERO, List.of());
     }
@@ -165,13 +172,13 @@ public class PayOutServiceImpl implements PayOutService {
             Wallet wallet = walletRepository.findByUser(user)
                     .orElseThrow(() -> new WalletNotFoundException("Wallet not found"));
 
-            BigDecimal totalCredit = payoutPerWinner.add(bet.getAmount());
-            wallet.setBalance(wallet.getBalance().add(totalCredit));
+//            BigDecimal totalCredit = payoutPerWinner.add(bet.getAmount());
+            wallet.setBalance(wallet.getBalance().add(payoutPerWinner));
             walletRepository.save(wallet);
 
             WalletTransaction transaction = new WalletTransaction();
             transaction.setWallet(wallet);
-            transaction.setAmount(totalCredit);
+            transaction.setAmount(payoutPerWinner);
             transaction.setTransactionType(TransactionType.WIN_CREDIT);
             transaction.setDescription("Payout for match " + match.getId());
             transaction.setMatch(match);

@@ -4,9 +4,6 @@ import com.example.cricket_app.dto.response.PagedWalletTransactionResponse;
 import com.example.cricket_app.dto.response.WalletTransactionResponse;
 import com.example.cricket_app.entity.WalletTransaction;
 import com.example.cricket_app.mapper.WalletTransactionMapper;
-import com.example.cricket_app.repository.MatchRepository;
-import com.example.cricket_app.repository.UserRepository;
-import com.example.cricket_app.repository.WalletRepository;
 import com.example.cricket_app.repository.WalletTransactionRepository;
 import com.example.cricket_app.security.AuthUtils;
 import com.example.cricket_app.service.WalletTransactionService;
@@ -22,19 +19,16 @@ import java.util.List;
 @Service
 public class WalletTransactionImpl implements WalletTransactionService {
 
-    private WalletRepository walletRepository;
-    private MatchRepository matchRepository;
-    private WalletTransactionRepository walletTransactionRepository;
-    private WalletTransactionMapper walletTransactionMapper;
-    private UserRepository userRepository;
+
+    private final WalletTransactionRepository walletTransactionRepository;
+    private final WalletTransactionMapper walletTransactionMapper;
+
 
     @Autowired
-    public WalletTransactionImpl(WalletRepository walletRepository, MatchRepository matchRepository, WalletTransactionRepository walletTransactionRepository, WalletTransactionMapper walletTransactionMapper, UserRepository userRepository) {
-        this.walletRepository = walletRepository;
-        this.matchRepository = matchRepository;
+    public WalletTransactionImpl(WalletTransactionRepository walletTransactionRepository, WalletTransactionMapper walletTransactionMapper) {
         this.walletTransactionRepository = walletTransactionRepository;
         this.walletTransactionMapper = walletTransactionMapper;
-        this.userRepository = userRepository;
+
 
     }
 
