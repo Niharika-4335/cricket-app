@@ -148,10 +148,8 @@ public class GlobalException {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleRunTimeException(Exception exception) {
-
-        ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE.value(), exception.getMessage(), null);
-
-        return new ResponseEntity<>(apiError, HttpStatus.NOT_ACCEPTABLE);
+        ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getMessage(), null);
+        return new ResponseEntity<>(apiError, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

@@ -13,6 +13,7 @@ import com.example.cricket_app.exception.*;
 import com.example.cricket_app.mapper.MatchMapper;
 import com.example.cricket_app.mapper.PastMatchesResultMapper;
 import com.example.cricket_app.mapper.PayOutMapper;
+import com.example.cricket_app.repository.BetRepository;
 import com.example.cricket_app.repository.MatchRepository;
 import com.example.cricket_app.repository.PayOutRepository;
 import com.example.cricket_app.service.BetService;
@@ -38,9 +39,10 @@ public class MatchServiceImpl implements MatchService {
     private final BetService betService;
     private final PayOutMapper payOutMapper;
     private final PayOutRepository payOutRepository;
+    private final BetRepository betRepository;
 
     @Autowired
-    public MatchServiceImpl(MatchRepository matchRepository, MatchMapper matchMapper, PayOutService payOutService, PastMatchesResultMapper pastMatchesResultMapper, BetService betService, PayOutMapper payOutMapper, PayOutRepository payOutRepository) {
+    public MatchServiceImpl(MatchRepository matchRepository, MatchMapper matchMapper, PayOutService payOutService, PastMatchesResultMapper pastMatchesResultMapper, BetService betService, PayOutMapper payOutMapper, PayOutRepository payOutRepository, BetRepository betRepository) {
         this.matchRepository = matchRepository;
         this.matchMapper = matchMapper;
         this.payOutService = payOutService;
@@ -48,10 +50,11 @@ public class MatchServiceImpl implements MatchService {
         this.betService = betService;
         this.payOutMapper = payOutMapper;
         this.payOutRepository = payOutRepository;
+        this.betRepository = betRepository;
     }
 
     @Override
-    public MatchResponse createMatch(CreateMatchRequest createMatchRequest){
+    public MatchResponse createMatch(CreateMatchRequest createMatchRequest) {
         //getting two teams names and checking whether they are in our enum or not.
         try {
             Team.valueOf(createMatchRequest.getTeamA().toUpperCase());
@@ -126,7 +129,7 @@ public class MatchServiceImpl implements MatchService {
 
         return payouts.stream()
                 .map(payOutMapper::toResponse)
-                .toList();
+                .toList();//we are returning payouts response after match is created.
     }
 
     @Override
@@ -157,10 +160,15 @@ public class MatchServiceImpl implements MatchService {
                 .toList();
 
         for (Match match : toComplete) {
-            match.setStatus(MatchStatus.AUTO_COMPLETED);
-            match.setUpdatedAt(now);
-            matchRepository.save(match);
-        }//after 20 minutes...match will be completed even if we place bets or not.match  will get auto completed.
+            boolean betsExist = betRepository.existsByMatch(match);
+            if (!betsExist) {
+                match.setStatus(MatchStatus.AUTO_COMPLETED);
+                match.setUpdatedAt(now);
+                matchRepository.save(match);
+            }
+
+        }
+        //after 20 minutes...match will be completed even if we place bets or not.match  will get auto completed.
 
     }
 

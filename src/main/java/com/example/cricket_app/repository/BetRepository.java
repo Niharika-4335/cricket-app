@@ -25,4 +25,6 @@ public interface BetRepository extends JpaRepository<Bet, Long> {
 
     Page<Bet> findByUser_IdOrderByIdDesc(Long userId, Pageable pageable);
 
+    boolean existsByMatch(Match match);
+
 }
