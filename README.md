@@ -1,10 +1,11 @@
-Cricket Betting Application
+**Cricket Betting Application**
 
 This project is a REST API-based Cricket Betting Application, built with Spring Boot.
 
-Features
+**Features**
 
-It provides a platform for:
+It provides a platform for:  
+
 1.Creating players and admin users
 
 2.Managing cricket matches
@@ -15,7 +16,7 @@ It provides a platform for:
 
 5.Generating and distributing payouts to the winning players
 
-Technologies Used
+**Technologies Used**
 
 Java 23
 
@@ -33,8 +34,7 @@ Maven for build and dependency management
 
 Lombok
 
-
-Entity Descriptions
+**Entity Descriptions**
 
 Users -> Stores player and admin information
 
@@ -48,8 +48,7 @@ Bet -> Stores player bets placed on matches
 
 Payout -> Handles the payout process and winning distributions
 
-
-Entity Relationships
+**Entity Relationships**
 
 Users -> Wallet (One-to-One)
 
