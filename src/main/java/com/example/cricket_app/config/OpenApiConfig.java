@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 public class OpenApiConfig {
 
     @Bean
-    public OpenAPI customOpenAPI() {
+    public OpenAPI customOpenAPI() {//this is like telling spring that i have created a bean->openapi object.
         final String securitySchemeName = "bearerAuth";
 
         SecurityScheme securityScheme = new SecurityScheme()
