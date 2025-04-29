@@ -13,20 +13,19 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI() {
         final String securitySchemeName = "bearerAuth";
 
-        // Create security scheme
         SecurityScheme securityScheme = new SecurityScheme()
                 .name(securitySchemeName)
                 .type(SecurityScheme.Type.HTTP)
                 .scheme("bearer")
-                .bearerFormat("JWT");
+                .bearerFormat("JWT");//this means telling the swagger that use Http authentication and token is jwt.
 
         SecurityRequirement securityRequirement = new SecurityRequirement();
-        securityRequirement.addList(securitySchemeName);
+        securityRequirement.addList(securitySchemeName);//adding authorization to the list of apis.
 
         Info apiInfo = new Info()
                 .title("Cricket App API")
                 .version("1.0")
-                .description("API documentation for Cricket Application");
+                .description("API documentation for Cricket Application");//this is api metadata appears on the ui page.
 
         // Build and return the OpenAPI object
         return new OpenAPI()
