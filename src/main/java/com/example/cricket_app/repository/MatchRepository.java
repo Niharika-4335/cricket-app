@@ -1,7 +1,6 @@
 package com.example.cricket_app.repository;
 
 import com.example.cricket_app.entity.Match;
-import com.example.cricket_app.enums.MatchStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,7 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Repository
 public interface MatchRepository extends JpaRepository<Match, Long> {

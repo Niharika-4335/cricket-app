@@ -1,6 +1,5 @@
 package com.example.cricket_app.mapper;
 
-import com.example.cricket_app.dto.response.SignUpResponse;
 import com.example.cricket_app.dto.response.UserResponse;
 import com.example.cricket_app.entity.Users;
 import org.mapstruct.Mapper;

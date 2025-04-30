@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @ControllerAdvice
-public class GlobalException {
+public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicateBetException.class)
     public ResponseEntity<ApiError> handleDuplicateBetException(DuplicateBetException duplicateBetException) {
 
@@ -157,7 +157,7 @@ public class GlobalException {
         Map<String, String> errors = new HashMap<>();
 
         // Iterate over all validation errors using a for-loop
-        for (Object error : ex.getBindingResult().getAllErrors()) {
+        for (var error : ex.getBindingResult().getAllErrors()) {
             FieldError fieldError = (FieldError) error;
             String fieldName = fieldError.getField();
             String message = fieldError.getDefaultMessage();

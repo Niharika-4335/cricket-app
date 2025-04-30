@@ -172,7 +172,6 @@ public class PayOutServiceImpl implements PayOutService {
             Wallet wallet = walletRepository.findByUser(user)
                     .orElseThrow(() -> new WalletNotFoundException("Wallet not found"));
 
-//            BigDecimal totalCredit = payoutPerWinner.add(bet.getAmount());
             wallet.setBalance(wallet.getBalance().add(payoutPerWinner));
             walletRepository.save(wallet);
 

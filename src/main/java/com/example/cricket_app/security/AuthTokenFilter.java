@@ -18,8 +18,8 @@ import java.io.IOException;
 public class AuthTokenFilter extends OncePerRequestFilter {
 
     //OncePerRequestFilter helps in 1 request->filter logic runs only once.
-    private JwtUtils jwtUtils;
-    private CustomUserDetailsService customUserDetailsService;
+    private final JwtUtils jwtUtils;
+    private  final CustomUserDetailsService customUserDetailsService;
 
     @Autowired
     public AuthTokenFilter(JwtUtils jwtUtils, CustomUserDetailsService customUserDetailsService) {

@@ -7,8 +7,6 @@ import com.example.cricket_app.dto.response.JwtResponse;
 import com.example.cricket_app.dto.response.PagedUserResponse;
 import com.example.cricket_app.dto.response.SignUpResponse;
 import org.springframework.data.domain.Pageable;
-//import org.springframework.data.domain.Page;
-//import org.springframework.data.domain.Pageable;
 
 public interface UserService {
 

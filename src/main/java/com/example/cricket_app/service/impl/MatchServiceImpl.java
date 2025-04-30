@@ -85,7 +85,7 @@ public class MatchServiceImpl implements MatchService {
         List<MatchResponse> matchResponses = matches.getContent()//we use get content to retrieve data from page.
                 .stream()
                 .map(matchMapper::toResponseDto)
-                .collect(Collectors.toList());
+                .toList();
 
         return new PagedUpcomingMatchResponse(
                 matchResponses,

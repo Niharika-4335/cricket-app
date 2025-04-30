@@ -74,7 +74,7 @@ public class BetServiceImpl implements BetService {
             throw new OngoingMatchException("Bets are not allowed after the match has started.");
         }
         BigDecimal betAmount = match.getBetAmount();
-        BigDecimal remainingBalance = getBigDecimal(wallet, betAmount);
+        BigDecimal remainingBalance = debitMoneyFromWallet(wallet, betAmount);
         wallet.setBalance(remainingBalance);
         walletRepository.save(wallet);
 
@@ -97,17 +97,11 @@ public class BetServiceImpl implements BetService {
 
     }
 
-    private static BigDecimal getBigDecimal(Wallet wallet, BigDecimal betAmount) {
+    private static BigDecimal debitMoneyFromWallet(Wallet wallet, BigDecimal betAmount) {
         BigDecimal currentBalance = wallet.getBalance();
         if (currentBalance == null || currentBalance.compareTo(betAmount) < 0) {
             throw new InsufficientBalanceException("Not enough funds to place this bet.");
         }
-//        try {
-//            System.out.println("Sleeping 10s for user: " + user.getId() + " on match: " + match.getId());
-//            Thread.sleep(10000);
-//        } catch (InterruptedException e) {
-//            Thread.currentThread().interrupt();
-//        }
         return currentBalance.subtract(betAmount);
     }
 

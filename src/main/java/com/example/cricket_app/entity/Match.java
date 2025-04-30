@@ -55,9 +55,6 @@ public class Match {
     @OneToMany(mappedBy = "match")
     private Set<Payout> payouts = new HashSet<>();
 
-//    @OneToOne(mappedBy = "match", cascade = CascadeType.ALL)
-//    private MatchPayoutStatus payoutStatus;
-
     @OneToMany(mappedBy = "match")
     private Set<WalletTransaction> transactions = new HashSet<>();
 

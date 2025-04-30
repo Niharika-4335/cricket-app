@@ -2,7 +2,6 @@ package com.example.cricket_app.config;
 
 import com.example.cricket_app.security.AuthEntryPointJwt;
 import com.example.cricket_app.security.AuthTokenFilter;
-import com.example.cricket_app.security.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,14 +20,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-    private AuthTokenFilter authTokenFilter;
-    private JwtUtils jwtUtils;
-    private AuthEntryPointJwt authEntryPointJwt;
+    private final AuthTokenFilter authTokenFilter;
+    private final AuthEntryPointJwt authEntryPointJwt;
 
     @Autowired
-    public SecurityConfig(AuthTokenFilter authTokenFilter, JwtUtils jwtUtils, AuthEntryPointJwt authEntryPointJwt) {
+    public SecurityConfig(AuthTokenFilter authTokenFilter,AuthEntryPointJwt authEntryPointJwt) {
         this.authTokenFilter = authTokenFilter;
-        this.jwtUtils = jwtUtils;
         this.authEntryPointJwt = authEntryPointJwt;
     }
 
@@ -50,7 +47,9 @@ public class SecurityConfig {
                         "/v3/api-docs/**",
                         "/v3/api-docs.yaml",
                         "/swagger-ui/**",
-                        "/swagger-ui.html"
+                        "/swagger-ui.html",
+                        "/swagger-resources/**",
+                        "/webjars/**"
                 ).permitAll()
                 .anyRequest().authenticated());
 

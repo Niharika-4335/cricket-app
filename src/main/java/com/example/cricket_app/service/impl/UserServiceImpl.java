@@ -111,6 +111,7 @@ public class UserServiceImpl implements UserService {
 
     }
 
+
     @Override
     public SignUpResponse registerAdmin(SignUpRequest signUpRequest) {
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
@@ -181,7 +182,7 @@ public class UserServiceImpl implements UserService {
         response.setRole(user.getRole());
         response.setBalance(wallet.getBalance());
         response.setPagedWalletTransactionResponse(pagedWalletTransactionResponse);
-        response.setBets(bets.stream().map(betMapper::toResponse).collect(Collectors.toList()));
+        response.setBets(bets.stream().map(betMapper::toResponse).toList());
 
         return response;
     }

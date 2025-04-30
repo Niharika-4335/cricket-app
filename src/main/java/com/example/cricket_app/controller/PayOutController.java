@@ -3,7 +3,6 @@ package com.example.cricket_app.controller;
 import com.example.cricket_app.dto.request.DeclareWinnerRequest;
 import com.example.cricket_app.dto.response.PayOutSummaryResponse;
 import com.example.cricket_app.dto.response.PayoutResponse;
-import com.example.cricket_app.repository.MatchRepository;
 import com.example.cricket_app.service.MatchService;
 import com.example.cricket_app.service.PayOutService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +16,11 @@ import java.util.List;
 public class PayOutController {
     private final MatchService matchService;
     private final PayOutService payOutService;
-    private  final MatchRepository matchRepository;
 
     @Autowired
-    public PayOutController(MatchService matchService, PayOutService payOutService, MatchRepository matchRepository) {
+    public PayOutController(MatchService matchService, PayOutService payOutService) {
         this.matchService = matchService;
         this.payOutService = payOutService;
-        this.matchRepository = matchRepository;
     }
 
     @PreAuthorize("hasRole('ADMIN')")

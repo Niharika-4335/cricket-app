@@ -27,9 +27,10 @@ import java.time.LocalDateTime;
 @Transactional
 public class WalletServiceImpl implements WalletService {
 
-    private final  WalletMapper walletMapper;
+    private static final String ACTION = "User not found";
+    private final WalletMapper walletMapper;
     private final WalletRepository walletRepository;
-    private  final UserRepository userRepository;
+    private final UserRepository userRepository;
     private final WalletTransactionRepository walletTransactionRepository;
 
 
@@ -45,7 +46,7 @@ public class WalletServiceImpl implements WalletService {
     @Override
     public WalletResponse initializeWallet(CreateWalletRequest request) {
         Users user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(ACTION));
 
         //if wallet is already present we are getting it by using wallet repository method.
         if (walletRepository.findByUser(user).isPresent()) {
@@ -69,7 +70,7 @@ public class WalletServiceImpl implements WalletService {
         }
 
         Users user = userRepository.findById(creditWalletRequest.getUserId())
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(ACTION));
 
         Wallet wallet = walletRepository.findByUser(user)
                 .orElseGet(() -> {
@@ -100,7 +101,7 @@ public class WalletServiceImpl implements WalletService {
     public WalletResponse viewCurrentBalance() {
         Long userId = AuthUtils.getLoggedInUserId();
         Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(ACTION));
 
         Wallet wallet = walletRepository.findByUser(user)
                 .orElseThrow(() -> new WalletNotFoundException("Wallet not found"));
