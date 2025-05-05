@@ -8,6 +8,7 @@ class CricketAppApplicationTests {
 
 	@Test
 	void contextLoads() {
+		System.out.println("this method doesn't need to generate any tests");
 	}
 
 }

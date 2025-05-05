@@ -157,7 +157,7 @@ public class PayOutServiceImpl implements PayOutService {
         adminTxn.setWallet(adminWallet);
         adminTxn.setAmount(adminCut);
         adminTxn.setTransactionType(TransactionType.ADMIN_COMMISSION);
-        adminTxn.setDescription("5% commission for match " + match.getId());
+        adminTxn.setDescription("5% commission for match admin" + match.getId());
         adminTxn.setMatch(match);
         walletTransactionRepository.save(adminTxn);
 

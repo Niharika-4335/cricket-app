@@ -13,4 +13,5 @@ public class PagedBetResponse {
     private int totalPages;
     private long totalUsers;
 
+
 }

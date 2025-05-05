@@ -59,7 +59,7 @@ public class MatchServiceImpl implements MatchService {
         try {
             Team.valueOf(createMatchRequest.getTeamA().toUpperCase());
             Team.valueOf(createMatchRequest.getTeamB().toUpperCase());
-        } catch (InvalidTeamChosenException e) {
+        } catch (IllegalArgumentException e) {
             throw new InvalidTeamChosenException("Invalid team name. Must be one of: " + Arrays.toString(Team.values()));
         }
 
