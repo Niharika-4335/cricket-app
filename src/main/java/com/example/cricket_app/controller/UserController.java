@@ -24,7 +24,7 @@ public class UserController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "DESC") String direction)
+            @RequestParam(defaultValue = "ASC") String direction)
     //spring internally converts request parameter to path parameter.
     {
         return userService.showUsers(page, size, sortBy, direction);
