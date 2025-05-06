@@ -14,7 +14,6 @@ public class BetResponse {
     private Long matchId;
     private String teamChosen;
     private BigDecimal amount;
-    @JsonIgnore
     private BetStatus status;
     @Schema(type = "string", format = "date-time", example = "2025-04-30T04:54:29.709Z")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
