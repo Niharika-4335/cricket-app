@@ -1,7 +1,6 @@
 package com.example.cricket_app.dto.response;
 
 
-import com.example.cricket_app.enums.BetStatus;
 import com.example.cricket_app.enums.MatchStatus;
 import com.example.cricket_app.enums.Team;
 import com.fasterxml.jackson.annotation.JsonFormat;

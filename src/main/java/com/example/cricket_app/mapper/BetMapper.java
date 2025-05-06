@@ -9,7 +9,7 @@ import org.mapstruct.Mapping;
 public interface BetMapper {
     @Mapping(source = "user.id", target = "userId")
     @Mapping(source = "match.id", target = "matchId")
-    @Mapping(source="status",target="status")
+    @Mapping(source = "status", target = "status")
     BetResponse toResponse(Bet bet);//we are showing match id from match.
 
 }

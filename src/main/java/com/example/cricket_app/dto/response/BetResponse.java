@@ -2,12 +2,12 @@ package com.example.cricket_app.dto.response;
 
 import com.example.cricket_app.enums.BetStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
 @Data
 public class BetResponse {
     private Long userId;
